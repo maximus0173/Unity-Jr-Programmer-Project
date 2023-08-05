@@ -14,7 +14,12 @@ public class UIMainScene : MonoBehaviour
         string GetData();
         void GetContent(ref List<Building.InventoryEntry> content);
     }
-    
+
+    [SerializeField]
+    private RectTransform loadHoverText;
+    [SerializeField]
+    private RectTransform unloadHoverText;
+
     public InfoPopup InfoPopup;
     public ResourceDatabase ResourceDB;
 
@@ -77,6 +82,30 @@ public class UIMainScene : MonoBehaviour
     public void BackToMenu()
     {
         SceneManager.LoadScene(0);
+    }
+
+    public void ShowLoadHoverText(Vector3 sourcePosition)
+    {
+        Vector3 screenPosition = Camera.main.WorldToScreenPoint(sourcePosition);
+        this.loadHoverText.gameObject.SetActive(true);
+        this.loadHoverText.position = screenPosition;
+    }
+
+    public void HideLoadHoverText()
+    {
+        this.loadHoverText.gameObject.SetActive(false);
+    }
+
+    public void ShowUnloadHoverText(Vector3 sourcePosition)
+    {
+        Vector3 screenPosition = Camera.main.WorldToScreenPoint(sourcePosition);
+        this.unloadHoverText.gameObject.SetActive(true);
+        this.unloadHoverText.position = screenPosition;
+    }
+
+    public void HideUnloadHoverText()
+    {
+        this.unloadHoverText.gameObject.SetActive(false);
     }
 
 }

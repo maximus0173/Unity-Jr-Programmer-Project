@@ -5,78 +5,138 @@ using UnityEngine;
 
 /// <summary>
 /// This script handle all the control code, so detecting when the users click on a unit or building and selecting those
-/// If a unit is selected it will give the order to go to the clicked point or building when right clicking.
 /// </summary>
 public class UserControl : MonoBehaviour
 {
-    public Camera GameCamera;
-    public float PanSpeed = 10.0f;
-    public GameObject Marker;
-    
-    private Unit m_Selected = null;
 
-    private void Start()
+    public static UserControl Instance { get; private set; }
+
+    [SerializeField] private Camera gameCamera;
+    [SerializeField] private float PanSpeed = 10.0f;
+
+    private RaycastHit? mouseRaycastHit = null;
+
+    public event System.EventHandler<OnMouseHoverEventArgs> OnMouseHover;
+    public event System.EventHandler<OnMouseClickEventArgs> OnMouseClick;
+
+    private void Awake()
     {
-        Marker.SetActive(false);
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+        Instance = this;
     }
 
     private void Update()
     {
-        Vector2 move = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-        GameCamera.transform.position = GameCamera.transform.position + new Vector3(move.y, 0, -move.x) * PanSpeed * Time.deltaTime;
+        HandleCameraMove();
+        HandleMouseRaycastHit();
+        HandleMouseHover();
+        HandleMouseButtonClick();
+        return;
+    }
 
+    void HandleCameraMove()
+    {
+        Vector2 move = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        gameCamera.transform.position = gameCamera.transform.position + new Vector3(move.y, 0, -move.x) * PanSpeed * Time.deltaTime;
+    }
+
+    void HandleMouseRaycastHit()
+    {
+        Vector3 mousePosition = Input.mousePosition;
+        var ray = gameCamera.ScreenPointToRay(mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit))
+        {
+            this.mouseRaycastHit = hit;
+        }
+        else
+        {
+            this.mouseRaycastHit = null;
+        }
+    }
+
+    void HandleMouseHover()
+    {
+        if (this.mouseRaycastHit == null)
+        {
+            return;
+        }
+        Vector3 mousePosition = Input.mousePosition;
+        RaycastHit hit = (RaycastHit)this.mouseRaycastHit;
+        GameObject mouseHoverObject = hit.collider.gameObject;
+        OnMouseHover?.Invoke(this, new OnMouseHoverEventArgs(mousePosition, hit.point, mouseHoverObject));
+    }
+
+    void HandleMouseButtonClick()
+    {
+        int buttonNumber = -1;
         if (Input.GetMouseButtonDown(0))
         {
-            var ray = GameCamera.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit))
-            {
-                //the collider could be children of the unit, so we make sure to check in the parent
-                var unit = hit.collider.GetComponentInParent<Unit>();
-                m_Selected = unit;
-                
-                
-                //check if the hit object have a IUIInfoContent to display in the UI
-                //if there is none, this will be null, so this will hid the panel if it was displayed
-                var uiInfo = hit.collider.GetComponentInParent<UIMainScene.IUIInfoContent>();
-                UIMainScene.Instance.SetNewInfoContent(uiInfo);
-            }
+            buttonNumber = 0;
+        } else if (Input.GetMouseButtonDown(1))
+        {
+            buttonNumber = 1;
         }
-        else if (m_Selected != null && Input.GetMouseButtonDown(1))
-        {//right click give order to the unit
-            var ray = GameCamera.ScreenPointToRay(Input.mousePosition);
-            RaycastHit hit;
-            if (Physics.Raycast(ray, out hit))
-            {
-                var building = hit.collider.GetComponentInParent<Building>();
-                
-                if (building != null)
-                {
-                    m_Selected.GoTo(building);
-                }
-                else
-                {
-                    m_Selected.GoTo(hit.point);
-                }
-            }
+        else if (Input.GetMouseButtonDown(2))
+        {
+            buttonNumber = 2;
         }
+        if (buttonNumber < 0)
+        {
+            return;
+        }
+        if (this.mouseRaycastHit == null)
+        {
+            return;
+        }
+        Vector3 mousePosition = Input.mousePosition;
+        RaycastHit hit = (RaycastHit)this.mouseRaycastHit;
+        GameObject clickedObject = hit.collider.gameObject;
+        OnMouseClick?.Invoke(this, new OnMouseClickEventArgs(buttonNumber, mousePosition, hit.point, clickedObject));
+    }
 
-        MarkerHandling();
-    }
-    
-    // Handle displaying the marker above the unit that is currently selected (or hiding it if no unit is selected)
-    void MarkerHandling()
+    public class OnMouseHoverEventArgs : System.EventArgs
     {
-        if (m_Selected == null && Marker.activeInHierarchy)
+
+        public Vector2 ScreenPosition { get; private set; }
+
+        public Vector3 WorldPosition { get; private set; }
+
+        public GameObject MouseHoveredObject { get; private set; }
+
+        public OnMouseHoverEventArgs(Vector2 screenPosition, Vector3 worldPosition, GameObject mouseHoveredObject)
         {
-            Marker.SetActive(false);
-            Marker.transform.SetParent(null);
+            this.ScreenPosition = screenPosition;
+            this.WorldPosition = worldPosition;
+            this.MouseHoveredObject = mouseHoveredObject;
         }
-        else if (m_Selected != null && Marker.transform.parent != m_Selected.transform)
-        {
-            Marker.SetActive(true);
-            Marker.transform.SetParent(m_Selected.transform, false);
-            Marker.transform.localPosition = Vector3.zero;
-        }    
     }
+
+    public class OnMouseClickEventArgs : System.EventArgs
+    {
+
+        private int mouseButtonNumber;
+
+        public Vector2 ScreenPosition { get; private set; }
+
+        public Vector3 WorldPosition { get; private set; }
+
+        public GameObject MouseClickedObject { get; private set; }
+
+        public bool IsLeftMouseButtonClicked { get => this.mouseButtonNumber == 0; }
+        public bool IsRightMouseButtonClicked { get => this.mouseButtonNumber == 1; }
+        public bool IsMiddleMouseButtonClicked { get => this.mouseButtonNumber == 2; }
+
+        public OnMouseClickEventArgs(int mouseButtonNumber, Vector2 screenPosition, Vector3 worldPosition, GameObject mouseClickedObject)
+        {
+            this.mouseButtonNumber = mouseButtonNumber;
+            this.ScreenPosition = screenPosition;
+            this.WorldPosition = worldPosition;
+            this.MouseClickedObject = mouseClickedObject;
+        }
+    }
+
 }
