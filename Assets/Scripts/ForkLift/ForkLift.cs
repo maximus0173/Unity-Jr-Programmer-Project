@@ -5,24 +5,25 @@ using UnityEngine;
 using UnityEngine.AI;
 
 [RequireComponent(typeof(NavMeshAgent))]
-public class ForkLift : MonoBehaviour
+public class Forklift : MonoBehaviour, IForklift
 {
 
-    private ForkLiftFork fork;
+    private ForkliftFork fork;
     private NavMeshAgent agent;
 
-    private ForkLiftMoveAction moveAction;
-    private ForkLiftLoadPaletteAction loadPaletteAction;
-    private ForkLiftUnloadPaletteOnTruckAction unloadPaletteOnTruckAction;
-    private ForkLiftBaseAction activeAction;
+    private ForkliftMoveAction moveAction;
+    private ForkliftLoadPaletteAction loadPaletteAction;
+    private ForkliftUnloadPaletteOnTruckAction unloadPaletteOnTruckAction;
+    private ForkliftUnloadPaletteOnRackAction unloadPaletteOnRackAction;
+    private ForkliftBaseAction activeAction;
 
     public bool IsSelected
     {
         get
         {
-            if (ForkLiftsManager.Instance != null)
+            if (ForkliftsManager.Instance != null)
             {
-                return ForkLiftsManager.Instance.IsForkLiftSelected(this);
+                return ForkliftsManager.Instance.IsForkliftSelected(this);
             }
             return false;
         }
@@ -30,25 +31,37 @@ public class ForkLift : MonoBehaviour
 
     public bool HasPalette { get => this.fork.HasPalette; }
 
+    public IPalette LoadedPalette { get => this.fork.LoadedPalette; }
+
+    public float Height { get => this.fork.ForkMaxHeight; }
+
+    public Vector3 Position { get => transform.position; }
+
+    public Transform ForkPaletteHandle { get => this.fork.PaletteHandle; }
+
     private void Start()
     {
-        this.fork = this.GetComponentInChildren<ForkLiftFork>();
+        this.fork = this.GetComponentInChildren<ForkliftFork>();
         this.agent = GetComponent<NavMeshAgent>();
-        this.moveAction = GetComponent<ForkLiftMoveAction>();
-        this.loadPaletteAction = GetComponent<ForkLiftLoadPaletteAction>();
-        this.unloadPaletteOnTruckAction = GetComponent<ForkLiftUnloadPaletteOnTruckAction>();
+        this.moveAction = GetComponent<ForkliftMoveAction>();
+        this.loadPaletteAction = GetComponent<ForkliftLoadPaletteAction>();
+        this.unloadPaletteOnTruckAction = GetComponent<ForkliftUnloadPaletteOnTruckAction>();
+        this.unloadPaletteOnRackAction = GetComponent<ForkliftUnloadPaletteOnRackAction>();
         this.activeAction = this.moveAction;
-        if (ForkLiftsManager.Instance != null)
+        this.loadPaletteAction.OnCompleteAction += OnCompleteAction;
+        this.unloadPaletteOnTruckAction.OnCompleteAction += OnCompleteAction;
+        this.unloadPaletteOnRackAction.OnCompleteAction += OnCompleteAction;
+        if (ForkliftsManager.Instance != null)
         {
-            ForkLiftsManager.Instance.RegisterForkLift(this);
+            ForkliftsManager.Instance.RegisterForklift(this);
         }
     }
 
     private void OnDestroy()
     {
-        if (ForkLiftsManager.Instance != null)
+        if (ForkliftsManager.Instance != null)
         {
-            ForkLiftsManager.Instance.UnregisterForkLift(this);
+            ForkliftsManager.Instance.UnregisterForklift(this);
         }
     }
 
@@ -79,12 +92,12 @@ public class ForkLift : MonoBehaviour
         }
     }
 
-    public bool CanLoadPalette(Palette palette)
+    public bool CanLoadPalette(IPalette palette)
     {
         return this.activeAction == this.moveAction && this.fork.CanLoadPalette(palette);
     }
 
-    public void LoadPalette(Palette palette)
+    public void MoveToLoadPalette(IPalette palette)
     {
         if (!CanLoadPalette(palette))
         {
@@ -98,12 +111,20 @@ public class ForkLift : MonoBehaviour
         this.loadPaletteAction.LoadPalette(palette);
     }
 
-    public bool CanUnloadPaletteOnTruck(Truck truck)
+    public bool CanUnloadPaletteOnTruck(ITruck truck)
     {
+        if (!this.HasPalette)
+        {
+            return false;
+        }
+        if (truck.ForkliftMaxHeight < this.Height)
+        {
+            return false;
+        }
         return true;
     }
 
-    public void UnloadPaletteOnTruck(Truck truck)
+    public void MoveToUnloadPaletteOnTruck(ITruck truck)
     {
         if (this.activeAction == this.moveAction)
         {
@@ -113,9 +134,38 @@ public class ForkLift : MonoBehaviour
         this.unloadPaletteOnTruckAction.UnloadPaletteOnTruck(truck);
     }
 
-    private void ActivateAction(ForkLiftBaseAction action)
+    public bool CanUnloadPaletteOnRack(IRack rack)
+    {
+        if (!this.HasPalette)
+        {
+            return false;
+        }
+        if (rack.Position.y > this.Height)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    public void MoveToUnloadPaletteOnRack(IRack rack)
+    {
+        if (this.activeAction == this.moveAction)
+        {
+            this.moveAction.Deactivate();
+        }
+        ActivateAction(this.unloadPaletteOnRackAction);
+        this.unloadPaletteOnRackAction.UnloadPaletteOnRack(rack);
+    }
+
+    private void ActivateAction(ForkliftBaseAction action)
     {
         this.activeAction = action;
+    }
+
+    private void OnCompleteAction(object sender, EventArgs e)
+    {
+        this.activeAction.Deactivate();
+        ActivateAction(this.moveAction);
     }
 
 }

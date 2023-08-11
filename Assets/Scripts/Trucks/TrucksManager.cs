@@ -37,34 +37,34 @@ public class TrucksManager : MonoBehaviour
 
     private void UserControl_OnMouseHover(object sender, UserControl.OnMouseHoverEventArgs e)
     {
-        if (ForkLiftsManager.Instance != null && UIMainScene.Instance != null)
+        if (ForkliftsManager.Instance != null && UIMainScene.Instance != null)
         {
-            if (ForkLiftsManager.Instance.SelectedForkLift != null
-                && ForkLiftsManager.Instance.SelectedForkLift.HasPalette
-                && ForkLiftsManager.Instance.SelectedForkLift.CanMove()
-                && e.MouseHoveredObject.TryGetComponent<Truck>(out Truck hoveredTruck)
-                && ForkLiftsManager.Instance.SelectedForkLift.CanUnloadPaletteOnTruck(hoveredTruck))
+            if (ForkliftsManager.Instance.SelectedForklift != null
+                && ForkliftsManager.Instance.SelectedForklift.HasPalette
+                && ForkliftsManager.Instance.SelectedForklift.CanMove()
+                && e.MouseHoveredObject.TryGetComponent<ITruck>(out ITruck hoveredTruck)
+                && GameManager.Instance.CanUnloadPaletteFromForkliftToTruck(ForkliftsManager.Instance.SelectedForklift, hoveredTruck))
             {
-                UIMainScene.Instance.ShowUnloadHoverText(hoveredTruck.InfoPosition);
+                UIMainScene.Instance.ShowUnloadOnTruckHoverText(hoveredTruck.InfoPosition);
             }
             else
             {
-                UIMainScene.Instance.HideUnloadHoverText();
+                UIMainScene.Instance.HideUnloadOnTruckHoverText();
             }
         }
     }
 
     private void UserControl_OnMouseClicked(object sender, UserControl.OnMouseClickEventArgs e)
     {
-        if (ForkLiftsManager.Instance != null)
+        if (ForkliftsManager.Instance != null)
         {
-            if (e.IsLeftMouseButtonClicked && ForkLiftsManager.Instance.SelectedForkLift != null
-                && ForkLiftsManager.Instance.SelectedForkLift.HasPalette
-                && ForkLiftsManager.Instance.SelectedForkLift.CanMove()
-                && e.MouseClickedObject.TryGetComponent<Truck>(out Truck clickedTruck)
-                && ForkLiftsManager.Instance.SelectedForkLift.CanUnloadPaletteOnTruck(clickedTruck))
+            if (e.IsLeftMouseButtonClicked && ForkliftsManager.Instance.SelectedForklift != null
+                && ForkliftsManager.Instance.SelectedForklift.HasPalette
+                && ForkliftsManager.Instance.SelectedForklift.CanMove()
+                && e.MouseClickedObject.TryGetComponent<ITruck>(out ITruck clickedTruck)
+                && GameManager.Instance.CanUnloadPaletteFromForkliftToTruck(ForkliftsManager.Instance.SelectedForklift, clickedTruck))
             {
-                ForkLiftsManager.Instance.SelectedForkLift.UnloadPaletteOnTruck(clickedTruck);
+                GameManager.Instance.MoveForkliftToUnloadPaletteToTruck(ForkliftsManager.Instance.SelectedForklift, clickedTruck);
             }
         }
     }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class ForkLiftMoveAction : ForkLiftBaseAction
+public class ForkliftMoveAction : ForkliftBaseAction
 {
 
     private NavMeshAgent agent;

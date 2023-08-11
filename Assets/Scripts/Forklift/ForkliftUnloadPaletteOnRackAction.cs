@@ -3,14 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class ForkliftLoadPaletteAction : ForkliftBaseAction
+public class ForkliftUnloadPaletteOnRackAction : ForkliftBaseAction
 {
 
     private ForkliftFork fork;
     private NavMeshAgent agent;
 
-    private IPalette targetPalette = null;
-    private Palette.ApproachPositions? targetPaletteApproachPositions = null;
+    private IRack targetRack = null;
+    private Rack.ApproachPositions? targetRackApproachPositions;
 
     private enum State
     {
@@ -18,7 +18,7 @@ public class ForkliftLoadPaletteAction : ForkliftBaseAction
         LongApproach,
         RotationAdjust,
         NearApproach,
-        Loading,
+        Unloading,
         Withdrawal
     }
 
@@ -46,8 +46,8 @@ public class ForkliftLoadPaletteAction : ForkliftBaseAction
                 case State.NearApproach:
                     HandleNearApproachState();
                     break;
-                case State.Loading:
-                    HandleLoadingState();
+                case State.Unloading:
+                    HandleUnloadingState();
                     break;
                 case State.Withdrawal:
                     HandleWithdrawalState();
@@ -58,11 +58,11 @@ public class ForkliftLoadPaletteAction : ForkliftBaseAction
 
     private void HandleLongApproachState()
     {
-        if (this.targetPaletteApproachPositions == null)
+        if (this.targetRackApproachPositions == null)
         {
             return;
         }
-        Vector3 targetPosition = ((Palette.ApproachPositions)this.targetPaletteApproachPositions).longApproachPosition;
+        Vector3 targetPosition = ((Rack.ApproachPositions)this.targetRackApproachPositions).longApproachPosition;
         if (HandleMoveToward(targetPosition))
         {
             this.agent.enabled = false;
@@ -72,12 +72,12 @@ public class ForkliftLoadPaletteAction : ForkliftBaseAction
 
     private void HandleRotationAdjustState()
     {
-        if (this.targetPaletteApproachPositions == null)
+        if (this.targetRackApproachPositions == null)
         {
             return;
         }
-        Vector3 targetPosition = ((Palette.ApproachPositions)this.targetPaletteApproachPositions).nearApproachPosition;
-        if (HandleRotationToward(targetPosition) && this.fork.IsForkHeightAdjustedToPalette(this.targetPalette))
+        Vector3 targetPosition = ((Rack.ApproachPositions)this.targetRackApproachPositions).nearApproachPosition;
+        if (HandleRotationToward(targetPosition) && this.fork.IsForkHeightAdjustedToRack(this.targetRack))
         {
             this.state = State.NearApproach;
         }
@@ -85,55 +85,54 @@ public class ForkliftLoadPaletteAction : ForkliftBaseAction
 
     private void HandleNearApproachState()
     {
-        if (this.targetPaletteApproachPositions == null)
+        if (this.targetRackApproachPositions == null)
         {
             return;
         }
-        Vector3 targetPosition = ((Palette.ApproachPositions)this.targetPaletteApproachPositions).nearApproachPosition;
+        Vector3 targetPosition = ((Rack.ApproachPositions)this.targetRackApproachPositions).nearApproachPosition;
         if (HandleMoveToward(targetPosition))
         {
-            this.state = State.Loading;
+            this.state = State.Unloading;
         }
     }
 
-    private void HandleLoadingState()
+    private void HandleUnloadingState()
     {
-        GameManager.Instance.LoadPaletteToForklift(this.targetPalette, this.forklift);
-        this.fork.LoadPalette(this.targetPalette);
+        GameManager.Instance.UnloadPaletteFromForkliftToRack(this.forklift, this.targetRack);
+        this.fork.UnloadPalette();
         this.state = State.Withdrawal;
-        this.fork.AdjustForkHeightToWithdrawal();
     }
 
     private void HandleWithdrawalState()
     {
-        if (this.targetPaletteApproachPositions == null)
+        if (this.targetRackApproachPositions == null)
         {
             return;
         }
-        Vector3 targetPosition = ((Palette.ApproachPositions)this.targetPaletteApproachPositions).longApproachPosition;
+        Vector3 targetPosition = ((Rack.ApproachPositions)this.targetRackApproachPositions).longApproachPosition;
         if (HandleMoveToward(targetPosition))
         {
             this.state = State.None;
-            this.targetPalette = null;
-            this.targetPaletteApproachPositions = null;
             this.agent.enabled = true;
-            this.fork.AdjustForkHeightToTransport();
+            GameManager.Instance.CompleteReserveationOfRackToUnloadPaletteFromForklift(this.forklift, this.targetRack);
+            this.targetRack = null;
+            this.targetRackApproachPositions = null;
             CompleteAction();
         }
     }
 
-    public void LoadPalette(IPalette palette)
+    public void UnloadPaletteOnRack(IRack rack)
     {
-        Palette.ApproachPositions? paletteApproachPositions = palette.GetForkliftApproachPositions(this.forklift);
-        if (paletteApproachPositions == null)
+        Rack.ApproachPositions? approachPositions = rack.GetForkliftApproachPositions(this.forklift);
+        if (approachPositions == null)
         {
             return;
         }
-        this.targetPalette = palette;
-        this.targetPaletteApproachPositions = paletteApproachPositions;
+        this.targetRack = rack;
+        this.targetRackApproachPositions = (Rack.ApproachPositions)approachPositions;
         this.state = State.LongApproach;
-        this.agent.SetDestination(((Palette.ApproachPositions)this.targetPaletteApproachPositions).longApproachPosition);
-        this.fork.AdjustForkHeightToPalette(this.targetPalette);
+        this.agent.SetDestination(((Rack.ApproachPositions)this.targetRackApproachPositions).longApproachPosition);
+        this.fork.AdjustForkHeightToRack(this.targetRack);
     }
 
     public override bool CanDeactivate()
@@ -154,13 +153,13 @@ public class ForkliftLoadPaletteAction : ForkliftBaseAction
         {
             return;
         }
-        if (this.targetPalette != null)
+        if (this.targetRack != null)
         {
-            GameManager.Instance.CancelMoveForkliftToLoadPalette(this.targetPalette, this.forklift);
+            GameManager.Instance.CancelMoveForkliftToUnloadPaletteToRack(this.forklift, this.targetRack);
         }
         this.agent.enabled = true;
-        this.targetPalette = null;
-        this.targetPaletteApproachPositions = null;
+        this.targetRack = null;
+        this.targetRackApproachPositions = null;
         this.state = State.None;
     }
 

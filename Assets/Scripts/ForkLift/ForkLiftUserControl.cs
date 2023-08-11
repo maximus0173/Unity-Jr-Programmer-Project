@@ -2,34 +2,34 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ForkLiftUserControl : MonoBehaviour, IUserInteraction
+public class ForkliftUserControl : MonoBehaviour, IUserInteraction
 {
 
-    private ForkLift forkLift;
+    private Forklift forklift;
 
     private void Awake()
     {
-        this.forkLift = GetComponent<ForkLift>();
+        this.forklift = GetComponent<Forklift>();
     }
 
     public void OnLeftMouseButtonClicked(Vector3 position)
     {
-        if (this.forkLift == null || ForkLiftsManager.Instance == null)
+        if (this.forklift == null || ForkliftsManager.Instance == null)
         {
             return;
         }
-        ForkLiftsManager.Instance.SelectForkLift(this.forkLift);
+        ForkliftsManager.Instance.SelectForklift(this.forklift);
     }
 
     public void OnRightMouseButtonClicked(Vector3 position)
     {
-        if (this.forkLift == null || ForkLiftsManager.Instance == null)
+        if (this.forklift == null || ForkliftsManager.Instance == null)
         {
             return;
         }
-        if (this.forkLift.IsSelected)
+        if (this.forklift.IsSelected)
         {
-            this.forkLift.MoveToPosition(position);
+            this.forklift.MoveToPosition(position);
         }
     }
 

@@ -2,12 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PalettesManager : MonoBehaviour
+public class RacksManager : MonoBehaviour
 {
 
-    public static PalettesManager Instance { get; private set; }
+    public static RacksManager Instance { get; private set; }
 
-    private List<Palette> allPalettes = new List<Palette>();
+    private List<Rack> allRacks = new List<Rack>();
 
     private void Awake()
     {
@@ -37,22 +37,23 @@ public class PalettesManager : MonoBehaviour
         }
     }
 
-    public void RegisterPalette(Palette palette)
+
+    public void RegisterRack(Rack rack)
     {
-        if (this.allPalettes.Contains(palette))
+        if (this.allRacks.Contains(rack))
         {
             return;
         }
-        this.allPalettes.Add(palette);
+        this.allRacks.Add(rack);
     }
 
-    public void UnregisterPalette(Palette palette)
+    public void UnregisterRack(Rack rack)
     {
-        if (!this.allPalettes.Contains(palette))
+        if (!this.allRacks.Contains(rack))
         {
             return;
         }
-        this.allPalettes.Remove(palette);
+        this.allRacks.Remove(rack);
     }
 
     private void UserControl_OnMouseHover(object sender, UserControl.OnMouseHoverEventArgs e)
@@ -60,14 +61,16 @@ public class PalettesManager : MonoBehaviour
         if (ForkliftsManager.Instance != null && UIMainScene.Instance != null)
         {
             if (ForkliftsManager.Instance.SelectedForklift != null
-                && e.MouseHoveredObject.TryGetComponent<IPalette>(out IPalette hoveredPalette)
-                && GameManager.Instance.CanLoadPaletteToForklift(hoveredPalette, ForkliftsManager.Instance.SelectedForklift))
+                && ForkliftsManager.Instance.SelectedForklift.HasPalette
+                && ForkliftsManager.Instance.SelectedForklift.CanMove()
+                && e.MouseHoveredObject.TryGetComponent<IRack>(out IRack hoveredRack)
+                && GameManager.Instance.CanUnloadPaletteFromForkliftToRack(ForkliftsManager.Instance.SelectedForklift, hoveredRack))
             {
-                UIMainScene.Instance.ShowLoadHoverText(hoveredPalette.Position);
+                UIMainScene.Instance.ShowUnloadOnRackHoverText(hoveredRack.Position);
             }
             else
             {
-                UIMainScene.Instance.HideLoadHoverText();
+                UIMainScene.Instance.HideUnloadOnRackHoverText();
             }
         }
     }
@@ -77,12 +80,15 @@ public class PalettesManager : MonoBehaviour
         if (ForkliftsManager.Instance != null)
         {
             if (e.IsLeftMouseButtonClicked && ForkliftsManager.Instance.SelectedForklift != null
-                && e.MouseClickedObject.TryGetComponent<IPalette>(out IPalette clickedPalette)
-                && GameManager.Instance.CanLoadPaletteToForklift(clickedPalette, ForkliftsManager.Instance.SelectedForklift))
+                && ForkliftsManager.Instance.SelectedForklift.HasPalette
+                && ForkliftsManager.Instance.SelectedForklift.CanMove()
+                && e.MouseClickedObject.TryGetComponent<IRack>(out IRack clickedRack)
+                && GameManager.Instance.CanUnloadPaletteFromForkliftToRack(ForkliftsManager.Instance.SelectedForklift, clickedRack))
             {
-                GameManager.Instance.MoveForkliftToLoadPalette(clickedPalette, ForkliftsManager.Instance.SelectedForklift);
+                GameManager.Instance.MoveForkliftToUnloadPaletteToRack(ForkliftsManager.Instance.SelectedForklift, clickedRack);
             }
         }
     }
+
 
 }

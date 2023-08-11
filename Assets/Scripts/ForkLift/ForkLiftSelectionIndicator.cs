@@ -2,37 +2,37 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ForkLiftSelectionIndicator : MonoBehaviour
+public class ForkliftSelectionIndicator : MonoBehaviour
 {
 
-    [SerializeField] private ForkLift forkLift;
+    [SerializeField] private Forklift forklift;
     [SerializeField] private GameObject selectionIndicator;
 
     private void Start()
     {
         HandleSelection();
-        if (ForkLiftsManager.Instance != null)
+        if (ForkliftsManager.Instance != null)
         {
-            ForkLiftsManager.Instance.OnSelectedForkLiftChanged += OnSelectedForkLiftChanged;
+            ForkliftsManager.Instance.OnSelectedForkliftChanged += OnSelectedForkliftChanged;
         }
     }
 
     private void OnDestroy()
     {
-        if (ForkLiftsManager.Instance != null)
+        if (ForkliftsManager.Instance != null)
         {
-            ForkLiftsManager.Instance.OnSelectedForkLiftChanged -= OnSelectedForkLiftChanged;
+            ForkliftsManager.Instance.OnSelectedForkliftChanged -= OnSelectedForkliftChanged;
         }
     }
 
-    private void OnSelectedForkLiftChanged(object sender, System.EventArgs e)
+    private void OnSelectedForkliftChanged(object sender, System.EventArgs e)
     {
         this.HandleSelection();
     }
 
     private void HandleSelection()
     {
-        if (ForkLiftsManager.Instance != null && ForkLiftsManager.Instance.IsForkLiftSelected(this.forkLift))
+        if (ForkliftsManager.Instance != null && ForkliftsManager.Instance.IsForkliftSelected(this.forklift))
         {
             this.selectionIndicator.SetActive(true);
             return;

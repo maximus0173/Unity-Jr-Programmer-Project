@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class ForkLiftUnloadPaletteOnTruckAction : ForkLiftBaseAction
+public class ForkliftUnloadPaletteOnTruckAction : ForkliftBaseAction
 {
 
-    private ForkLiftFork fork;
+    private ForkliftFork fork;
     private NavMeshAgent agent;
 
-    private Truck targetTruck = null;
+    private ITruck targetTruck = null;
     private Truck.ForkliftUnloadPositions? targetTruckUnloadPositions;
 
     private enum State
@@ -27,7 +27,7 @@ public class ForkLiftUnloadPaletteOnTruckAction : ForkLiftBaseAction
     protected override void Awake()
     {
         base.Awake();
-        this.fork = this.forkLift.GetComponentInChildren<ForkLiftFork>();
+        this.fork = this.forklift.GetComponentInChildren<ForkliftFork>();
         this.agent = GetComponent<NavMeshAgent>();
     }
 
@@ -62,9 +62,8 @@ public class ForkLiftUnloadPaletteOnTruckAction : ForkLiftBaseAction
         {
             return;
         }
-        float minDistanceDiff = 0.1f;
         Vector3 targetPosition = ((Truck.ForkliftUnloadPositions)this.targetTruckUnloadPositions).approachPosition;
-        if (GameUtils.Distance2d(targetPosition, transform.position) < minDistanceDiff)
+        if (HandleMoveToward(targetPosition))
         {
             this.agent.enabled = false;
             this.state = State.RotationAdjust;
@@ -102,6 +101,7 @@ public class ForkLiftUnloadPaletteOnTruckAction : ForkLiftBaseAction
         this.fork.AdjustForkHeightToUnload();
         if (this.fork.ForkHeight < 0.1f)
         {
+            GameManager.Instance.UnloadPaletteFromForkliftToTruck(this.forklift, this.targetTruck);
             this.fork.UnloadPalette();
             this.state = State.Withdrawal;
         }
@@ -118,12 +118,16 @@ public class ForkLiftUnloadPaletteOnTruckAction : ForkLiftBaseAction
         {
             this.state = State.None;
             this.agent.enabled = true;
+            GameManager.Instance.CompleteReserveationOfTruckToUnloadPaletteFromForklift(this.forklift, this.targetTruck);
+            this.targetTruck = null;
+            this.targetTruckUnloadPositions = null;
+            CompleteAction();
         }
     }
 
-    public void UnloadPaletteOnTruck(Truck truck)
+    public void UnloadPaletteOnTruck(ITruck truck)
     {
-        Truck.ForkliftUnloadPositions? truckUnloadPositions = truck.GetForkLiftUnloadPositions(this.forkLift);
+        Truck.ForkliftUnloadPositions? truckUnloadPositions = truck.GetForkliftUnloadPositions(this.forklift);
         if (truckUnloadPositions == null)
         {
             return;
@@ -132,7 +136,34 @@ public class ForkLiftUnloadPaletteOnTruckAction : ForkLiftBaseAction
         this.targetTruckUnloadPositions = (Truck.ForkliftUnloadPositions)truckUnloadPositions;
         this.state = State.LongApproach;
         this.agent.SetDestination(((Truck.ForkliftUnloadPositions)this.targetTruckUnloadPositions).approachPosition);
+    }
 
+    public override bool CanDeactivate()
+    {
+        switch (this.state)
+        {
+            case State.None:
+            case State.LongApproach:
+            case State.RotationAdjust:
+                return true;
+        }
+        return false;
+    }
+
+    public override void Deactivate()
+    {
+        if (!CanDeactivate())
+        {
+            return;
+        }
+        if (this.targetTruck != null)
+        {
+            GameManager.Instance.CancelMoveForkliftToUnloadPaletteToTruck(this.forklift, this.targetTruck);
+        }
+        this.agent.enabled = true;
+        this.targetTruck = null;
+        this.targetTruckUnloadPositions = null;
+        this.state = State.None;
     }
 
 }

@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Truck : MonoBehaviour
+public class Truck : MonoBehaviour, ITruck
 {
 
     [SerializeField]
-    private Transform forkLiftApproachTransform;
+    private Transform forkliftApproachTransform;
 
     [SerializeField]
     private List<Transform> paletteTransforms = new List<Transform>();
@@ -15,18 +15,71 @@ public class Truck : MonoBehaviour
     private Transform infoTransform;
 
     [SerializeField]
-    private float forkLiftMaxHeight = 2.5f;
+    private float forkliftMaxHeight = 2.5f;
 
-    private List<Palette> loadedPalettes = new List<Palette>();
+    private List<IPalette> loadedPalettes = new List<IPalette>();
 
     public Vector3 InfoPosition { get => this.infoTransform.position; }
 
-    public ForkliftUnloadPositions? GetForkLiftUnloadPositions(ForkLift forkLift)
+    public float ForkliftMaxHeight { get => this.forkliftMaxHeight; }
+
+    public IForklift reservedForUnloadPaletteFromForklift = null;
+
+    public bool CanUnloadPaletteFromForklift(IForklift forklift)
     {
+        if (this.reservedForUnloadPaletteFromForklift != null && this.reservedForUnloadPaletteFromForklift != forklift)
+        {
+            return false;
+        }
+        if (forklift.Height > this.forkliftMaxHeight)
+        {
+            return false;
+        }
+        if (this.loadedPalettes.Count >= this.paletteTransforms.Count)
+        {
+            return false;
+        }
+        return true;
+    }
+
+    public void ReserveForUnloadPaletteFromForklift(IForklift forklift)
+    {
+        if (!CanUnloadPaletteFromForklift(forklift))
+        {
+            throw new System.Exception("Cannot reserve for unload palette from forklift");
+        }
+        this.reservedForUnloadPaletteFromForklift = forklift;
+    }
+
+    public void UnloadPaletteFromForklift(IForklift forklift)
+    {
+        if (!CanUnloadPaletteFromForklift(forklift))
+        {
+            throw new System.Exception("Cannot unload palette from forklift");
+        }
+        this.loadedPalettes.Add(forklift.LoadedPalette);
+    }
+
+    public void CompleteReservationForUnloadPaletteFromForklift(IForklift forklift)
+    {
+        if (this.reservedForUnloadPaletteFromForklift != forklift)
+        {
+            throw new System.Exception("Cannot complete reservation for unload palette from forklift");
+        }
+        this.reservedForUnloadPaletteFromForklift = null;
+    }
+
+    public ForkliftUnloadPositions? GetForkliftUnloadPositions(IForklift forklift)
+    {
+        int index = this.loadedPalettes.Count;
+        if (index >= this.paletteTransforms.Count)
+        {
+            return null;
+        }
         return new ForkliftUnloadPositions()
         {
-            approachPosition = this.forkLiftApproachTransform.position,
-            palettePosition = this.paletteTransforms[0].position
+            approachPosition = this.forkliftApproachTransform.position,
+            palettePosition = this.paletteTransforms[index].position
         };
     }
 

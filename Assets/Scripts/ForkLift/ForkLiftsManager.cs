@@ -2,17 +2,17 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ForkLiftsManager : MonoBehaviour
+public class ForkliftsManager : MonoBehaviour
 {
 
-    public static ForkLiftsManager Instance { get; private set; }
+    public static ForkliftsManager Instance { get; private set; }
 
-    private List<ForkLift> allForkLifts = new List<ForkLift>();
-    private ForkLift selectedForkLift = null;
+    private List<Forklift> allForklifts = new List<Forklift>();
+    private Forklift selectedForklift = null;
 
-    public ForkLift SelectedForkLift { get => this.selectedForkLift; }
+    public IForklift SelectedForklift { get => this.selectedForklift; }
 
-    public event System.EventHandler OnSelectedForkLiftChanged;
+    public event System.EventHandler OnSelectedForkliftChanged;
 
     private void Awake()
     {
@@ -40,53 +40,53 @@ public class ForkLiftsManager : MonoBehaviour
         }
     }
 
-    public void RegisterForkLift(ForkLift forkLift)
+    public void RegisterForklift(Forklift forklift)
     {
-        if (this.allForkLifts.Contains(forkLift))
+        if (this.allForklifts.Contains(forklift))
         {
             return;
         }
-        this.allForkLifts.Add(forkLift);
+        this.allForklifts.Add(forklift);
     }
 
-    public void UnregisterForkLift(ForkLift forkLift)
+    public void UnregisterForklift(Forklift forklift)
     {
-        if (!this.allForkLifts.Contains(forkLift))
+        if (!this.allForklifts.Contains(forklift))
         {
             return;
         }
-        this.allForkLifts.Remove(forkLift);
-        if (this.selectedForkLift == forkLift)
+        this.allForklifts.Remove(forklift);
+        if (this.selectedForklift == forklift)
         {
-            this.selectedForkLift = null;
-            this.OnSelectedForkLiftChanged?.Invoke(this, System.EventArgs.Empty);
+            this.selectedForklift = null;
+            this.OnSelectedForkliftChanged?.Invoke(this, System.EventArgs.Empty);
         }
     }
 
-    public bool IsForkLiftSelected(ForkLift forkLift)
+    public bool IsForkliftSelected(Forklift forklift)
     {
-        return this.selectedForkLift == forkLift;
+        return this.selectedForklift == forklift;
     }
 
-    public void SelectForkLift(ForkLift forkLift)
+    public void SelectForklift(Forklift forklift)
     {
-        if (this.selectedForkLift == forkLift)
+        if (this.selectedForklift == forklift)
         {
             return;
         }
-        this.selectedForkLift = forkLift;
-        this.OnSelectedForkLiftChanged?.Invoke(this, System.EventArgs.Empty);
+        this.selectedForklift = forklift;
+        this.OnSelectedForkliftChanged?.Invoke(this, System.EventArgs.Empty);
     }
 
     private void UserControl_OnMouseClicked(object sender, UserControl.OnMouseClickEventArgs e)
     {
-        if (e.IsLeftMouseButtonClicked && e.MouseClickedObject.TryGetComponent<ForkLift>(out ForkLift clickedForkLift))
+        if (e.IsLeftMouseButtonClicked && e.MouseClickedObject.TryGetComponent<Forklift>(out Forklift clickedForklift))
         {
-            SelectForkLift(clickedForkLift);
+            SelectForklift(clickedForklift);
         }
-        if (this.selectedForkLift && e.IsLeftMouseButtonClicked && e.MouseClickedObject.CompareTag("Ground"))
+        if (this.selectedForklift && e.IsLeftMouseButtonClicked && e.MouseClickedObject.CompareTag("Ground"))
         {
-            this.selectedForkLift.MoveToPosition(e.WorldPosition);
+            this.selectedForklift.MoveToPosition(e.WorldPosition);
         }
     }
 

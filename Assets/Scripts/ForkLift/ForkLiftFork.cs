@@ -2,10 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ForkLiftFork : MonoBehaviour
+public class ForkliftFork : MonoBehaviour
 {
 
-    private ForkLift forkLift;
+    private Forklift forklift;
+
+    [SerializeField]
+    private Transform paletteHandle;
 
     [SerializeField] private float maxHeight = 2f;
     private float speed = 1f;
@@ -13,16 +16,20 @@ public class ForkLiftFork : MonoBehaviour
     private float targetForkHeight = 0f;
     private float currentVelocity;
 
-    private Palette loadedPalette = null;
+    private IPalette loadedPalette = null;
 
     public float ForkHeight { get => transform.localPosition.y; }
     public float ForkMaxHeight { get => this.maxHeight; }
 
     public bool HasPalette { get => this.loadedPalette != null; }
 
+    public IPalette LoadedPalette { get => this.loadedPalette; }
+
+    public Transform PaletteHandle { get => this.paletteHandle; }
+
     private void Awake()
     {
-        this.forkLift = GetComponentInParent<ForkLift>();
+        this.forklift = GetComponentInParent<Forklift>();
     }
 
     private void Update()
@@ -31,19 +38,45 @@ public class ForkLiftFork : MonoBehaviour
         transform.localPosition = new Vector3(transform.localPosition.x, newHeight, transform.localPosition.z);
     }
 
-    public bool CanLoadPalette(Palette palette)
+    public bool CanLoadPalette(IPalette palette)
     {
-        if (this.loadedPalette != null || !palette.CanBeTransported())
+        if (this.loadedPalette != null)
         {
             return false;
         }
-        float paletteHeight = transform.InverseTransformPoint(palette.transform.position).y;
+        float paletteHeight = this.forklift.transform.InverseTransformPoint(palette.Position).y;
         return this.maxHeight >= paletteHeight;
     }
 
-    public void AdjustForkHeightToPalette(Palette palette)
+    public bool IsForkHeightAdjustedToPalette(IPalette palette)
     {
-        this.targetForkHeight = transform.InverseTransformPoint(palette.transform.position).y;
+        float minDistance = 0.1f;
+        if (Mathf.Abs(transform.position.y - palette.Position.y) < minDistance)
+        {
+            return true;
+        }
+        return false;
+    }
+
+    public void AdjustForkHeightToPalette(IPalette palette)
+    {
+        this.targetForkHeight = this.forklift.transform.InverseTransformPoint(palette.Position).y;
+    }
+
+    public bool IsForkHeightAdjustedToRack(IRack rack)
+    {
+        float minDistance = 0.1f;
+        if (Mathf.Abs(transform.position.y - rack.Position.y) < minDistance)
+        {
+            return true;
+        }
+        return false;
+    }
+
+
+    public void AdjustForkHeightToRack(IRack rack)
+    {
+        this.targetForkHeight = this.forklift.transform.InverseTransformPoint(rack.Position).y;
     }
 
     public void AdjustForkHeightToWithdrawal()
@@ -63,15 +96,14 @@ public class ForkLiftFork : MonoBehaviour
         this.targetForkHeight = transportForkHeight;
     }
 
-    public void LoadPalette(Palette palette)
+    public void LoadPalette(IPalette palette)
     {
         this.loadedPalette = palette;
-        this.loadedPalette.transform.parent = transform;
+
     }
 
     public void UnloadPalette()
     {
-        this.loadedPalette.transform.parent = null;
         this.loadedPalette = null;
     }
 

@@ -18,7 +18,9 @@ public class UIMainScene : MonoBehaviour
     [SerializeField]
     private RectTransform loadHoverText;
     [SerializeField]
-    private RectTransform unloadHoverText;
+    private RectTransform unloadOnTruckHoverText;
+    [SerializeField]
+    private RectTransform unloadOnRackHoverText;
 
     public InfoPopup InfoPopup;
     public ResourceDatabase ResourceDB;
@@ -96,16 +98,28 @@ public class UIMainScene : MonoBehaviour
         this.loadHoverText.gameObject.SetActive(false);
     }
 
-    public void ShowUnloadHoverText(Vector3 sourcePosition)
+    public void ShowUnloadOnTruckHoverText(Vector3 sourcePosition)
     {
         Vector3 screenPosition = Camera.main.WorldToScreenPoint(sourcePosition);
-        this.unloadHoverText.gameObject.SetActive(true);
-        this.unloadHoverText.position = screenPosition;
+        this.unloadOnTruckHoverText.gameObject.SetActive(true);
+        this.unloadOnTruckHoverText.position = screenPosition;
     }
 
-    public void HideUnloadHoverText()
+    public void HideUnloadOnTruckHoverText()
     {
-        this.unloadHoverText.gameObject.SetActive(false);
+        this.unloadOnTruckHoverText.gameObject.SetActive(false);
+    }
+
+    public void ShowUnloadOnRackHoverText(Vector3 sourcePosition)
+    {
+        Vector3 screenPosition = Camera.main.WorldToScreenPoint(sourcePosition);
+        this.unloadOnRackHoverText.gameObject.SetActive(true);
+        this.unloadOnRackHoverText.position = screenPosition;
+    }
+
+    public void HideUnloadOnRackHoverText()
+    {
+        this.unloadOnRackHoverText.gameObject.SetActive(false);
     }
 
 }

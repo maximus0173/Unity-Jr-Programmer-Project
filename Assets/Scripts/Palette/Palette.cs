@@ -2,15 +2,27 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Palette : MonoBehaviour
+public class Palette : MonoBehaviour, IPalette
 {
 
     [SerializeField]
-    private List<Transform> forkLiftApproachTransforms = new List<Transform>();
+    private List<Transform> forkliftApproachTransforms = new List<Transform>();
     [SerializeField]
-    private List<Transform> forkLiftLoadingTransforms = new List<Transform>();
+    private List<Transform> forkliftLoadingTransforms = new List<Transform>();
 
-    private ForkLift transportedByForkLift;
+    private IRack mountedToRack;
+    private IForklift pendingTransportByForklift;
+    private IForklift transportedByForklift;
+
+    public bool IsMountedToRack { get => this.mountedToRack != null; }
+
+    public bool IsPendingTransport { get => this.pendingTransportByForklift != null; }
+
+    public bool IsTransportedByForklift { get => this.transportedByForklift != null; }
+
+    public IRack MountedToRack { get => this.mountedToRack; }
+
+    public Vector3 Position { get => transform.position; }
 
     private void Start()
     {
@@ -28,38 +40,76 @@ public class Palette : MonoBehaviour
         }
     }
 
+    public bool CanBeMountedToRack()
+    {
+        return this.mountedToRack == null;
+    }
+
+    public void MountToRack(IRack rack)
+    {
+        this.mountedToRack = rack;
+        transform.position = rack.Position;
+        transform.rotation = rack.Rotation;
+    }
+
+    public void UnmountFromRack()
+    {
+        if (this.mountedToRack == null)
+        {
+            return;
+        }
+        this.mountedToRack = null;
+    }
+
     public bool CanBeTransported()
     {
-        return this.transportedByForkLift == null;
+        return this.pendingTransportByForklift == null && this.transportedByForklift == null;
     }
 
-    public void TransportByForkLift(ForkLift forkLift)
+    public void PendingTransportByForklift(IForklift forklift)
     {
-        this.transportedByForkLift = forkLift;
+        if (!CanBeTransported())
+        {
+            return;
+        }
+        this.pendingTransportByForklift = forklift;
+        this.transportedByForklift = null;
     }
 
-    public void CancelTransportByForkLift()
+    public void LoadToForklift(IForklift forklift)
     {
-        this.transportedByForkLift = null;
+        if (this.pendingTransportByForklift != forklift)
+        {
+            return;
+        }
+        this.pendingTransportByForklift = null;
+        this.transportedByForklift = forklift;
+        transform.parent = forklift.ForkPaletteHandle;
+        transform.localPosition = Vector3.zero;
     }
 
-    public void dropToFloor()
+    public void CancelPendingTransportByForklift()
     {
-        this.transportedByForkLift = null;
+        this.pendingTransportByForklift = null;
     }
 
-    public void dropToRack()
+    public void UnloadFromForklift()
     {
-        this.transportedByForkLift = null;
+        if (!IsTransportedByForklift)
+        {
+            return;
+        }
+        transform.parent = null;
+        this.transportedByForklift = null;
     }
 
-    public ApproachPositions? GetForkLiftApproachPositions(ForkLift forkLift)
+    public ApproachPositions? GetForkliftApproachPositions(IForklift forklift)
     {
         Transform longApproachTransform = null;
         float approachDistance = -1;
-        foreach (Transform t in this.forkLiftApproachTransforms)
+        foreach (Transform t in this.forkliftApproachTransforms)
         {
-            float d = Vector3.Distance(t.position, forkLift.transform.position);
+            float d = Vector3.Distance(t.position, forklift.Position);
             if (longApproachTransform == null || d < approachDistance)
             {
                 longApproachTransform = t;
@@ -72,7 +122,7 @@ public class Palette : MonoBehaviour
         }
         Transform nearApproachTransform = null;
         approachDistance = -1;
-        foreach (Transform t in this.forkLiftLoadingTransforms)
+        foreach (Transform t in this.forkliftLoadingTransforms)
         {
             float d = Vector3.Distance(t.position, longApproachTransform.position);
             if (nearApproachTransform == null || d < approachDistance)
