@@ -39,12 +39,12 @@ public class Rack : MonoBehaviour, IRack
 
     private void InitialPaletteMounts()
     {
-        RaycastHit[] hits = Physics.BoxCastAll(this.mountCollider.bounds.center, this.mountCollider.bounds.extents / 2, transform.forward);
+        RaycastHit[] hits = Physics.BoxCastAll(this.mountCollider.bounds.center, this.mountCollider.bounds.size / 2, transform.forward);
         foreach (RaycastHit hit in hits)
         {
             if (hit.collider.TryGetComponent<IPalette>(out IPalette palette))
             {
-                GameManager.Instance.MountPaletteToRack(palette, this);
+                MountPalette(palette);
             }
         }
     }

@@ -1,11 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Playables;
 
 public class TrucksManager : MonoBehaviour
 {
 
     public static TrucksManager Instance { get; private set; }
+
+    [SerializeField] private PlayableDirector truckArriveTimeline;
+    [SerializeField] private PlayableDirector truckDepartureTimeline;
 
     private void Awake()
     {

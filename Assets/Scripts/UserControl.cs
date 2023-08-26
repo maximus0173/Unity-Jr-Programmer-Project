@@ -13,6 +13,8 @@ public class UserControl : MonoBehaviour
 
     [SerializeField] private Camera gameCamera;
     [SerializeField] private float PanSpeed = 10.0f;
+    [SerializeField] private Vector2 cameraCageX = new Vector2(-25f, 9f);
+    [SerializeField] private Vector2 cameraCageZ = new Vector2(-12f, 0f);
 
     private RaycastHit? mouseRaycastHit = null;
 
@@ -41,7 +43,23 @@ public class UserControl : MonoBehaviour
     void HandleCameraMove()
     {
         Vector2 move = new Vector2(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
-        gameCamera.transform.position = gameCamera.transform.position + new Vector3(move.y, 0, -move.x) * PanSpeed * Time.deltaTime;
+        Vector3 newPosition = gameCamera.transform.position + new Vector3(move.y, 0, -move.x) * PanSpeed * Time.deltaTime;
+        if (newPosition.x < this.cameraCageX.x)
+        {
+            newPosition.x = this.cameraCageX.x;
+        } else if (newPosition.x > this.cameraCageX.y)
+        {
+            newPosition.x = this.cameraCageX.y;
+        }
+        if (newPosition.z < this.cameraCageZ.x)
+        {
+            newPosition.z = this.cameraCageZ.x;
+        }
+        else if (newPosition.z > this.cameraCageZ.y)
+        {
+            newPosition.z = this.cameraCageZ.y;
+        }
+        gameCamera.transform.position = newPosition;
     }
 
     void HandleMouseRaycastHit()

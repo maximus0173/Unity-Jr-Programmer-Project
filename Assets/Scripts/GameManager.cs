@@ -135,8 +135,9 @@ public class GameManager : MonoBehaviour
         Palette rootPalette = forklift.LoadedPalette as Palette;
         Forklift rootForklift = forklift as Forklift;
         Truck rootTruck = truck as Truck;
-        rootTruck.UnloadPaletteFromForklift(forklift);
         rootPalette.UnloadFromForklift();
+        rootTruck.UnloadPaletteFromForklift(forklift);
+        rootPalette.transform.parent = rootTruck.transform;
     }
 
     public void CompleteReserveationOfTruckToUnloadPaletteFromForklift(IForklift forklift, ITruck truck)
