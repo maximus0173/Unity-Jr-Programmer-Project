@@ -9,8 +9,8 @@ public class ForkliftLoadPaletteAction : ForkliftBaseAction
     private ForkliftFork fork;
     private NavMeshAgent agent;
 
-    private IPalette targetPalette = null;
-    private Palette.ApproachPositions? targetPaletteApproachPositions = null;
+    private IPallet targetPalette = null;
+    private Pallet.ApproachPositions? targetPaletteApproachPositions = null;
 
     private enum State
     {
@@ -62,7 +62,7 @@ public class ForkliftLoadPaletteAction : ForkliftBaseAction
         {
             return;
         }
-        Vector3 targetPosition = ((Palette.ApproachPositions)this.targetPaletteApproachPositions).longApproachPosition;
+        Vector3 targetPosition = ((Pallet.ApproachPositions)this.targetPaletteApproachPositions).longApproachPosition;
         if (HandleMoveToward(targetPosition))
         {
             this.agent.enabled = false;
@@ -76,7 +76,7 @@ public class ForkliftLoadPaletteAction : ForkliftBaseAction
         {
             return;
         }
-        Vector3 targetPosition = ((Palette.ApproachPositions)this.targetPaletteApproachPositions).nearApproachPosition;
+        Vector3 targetPosition = ((Pallet.ApproachPositions)this.targetPaletteApproachPositions).nearApproachPosition;
         if (HandleRotationToward(targetPosition) && this.fork.IsForkHeightAdjustedToPalette(this.targetPalette))
         {
             this.state = State.NearApproach;
@@ -89,7 +89,7 @@ public class ForkliftLoadPaletteAction : ForkliftBaseAction
         {
             return;
         }
-        Vector3 targetPosition = ((Palette.ApproachPositions)this.targetPaletteApproachPositions).nearApproachPosition;
+        Vector3 targetPosition = ((Pallet.ApproachPositions)this.targetPaletteApproachPositions).nearApproachPosition;
         if (HandleMoveToward(targetPosition))
         {
             this.state = State.Loading;
@@ -110,7 +110,7 @@ public class ForkliftLoadPaletteAction : ForkliftBaseAction
         {
             return;
         }
-        Vector3 targetPosition = ((Palette.ApproachPositions)this.targetPaletteApproachPositions).longApproachPosition;
+        Vector3 targetPosition = ((Pallet.ApproachPositions)this.targetPaletteApproachPositions).longApproachPosition;
         if (HandleMoveToward(targetPosition))
         {
             this.state = State.None;
@@ -122,17 +122,17 @@ public class ForkliftLoadPaletteAction : ForkliftBaseAction
         }
     }
 
-    public void LoadPalette(IPalette palette)
+    public void LoadPalette(IPallet pallet)
     {
-        Palette.ApproachPositions? paletteApproachPositions = palette.GetForkliftApproachPositions(this.forklift);
-        if (paletteApproachPositions == null)
+        Pallet.ApproachPositions? palletApproachPositions = pallet.GetForkliftApproachPositions(this.forklift);
+        if (palletApproachPositions == null)
         {
             return;
         }
-        this.targetPalette = palette;
-        this.targetPaletteApproachPositions = paletteApproachPositions;
+        this.targetPalette = pallet;
+        this.targetPaletteApproachPositions = palletApproachPositions;
         this.state = State.LongApproach;
-        this.agent.SetDestination(((Palette.ApproachPositions)this.targetPaletteApproachPositions).longApproachPosition);
+        this.agent.SetDestination(((Pallet.ApproachPositions)this.targetPaletteApproachPositions).longApproachPosition);
         this.fork.AdjustForkHeightToPalette(this.targetPalette);
     }
 

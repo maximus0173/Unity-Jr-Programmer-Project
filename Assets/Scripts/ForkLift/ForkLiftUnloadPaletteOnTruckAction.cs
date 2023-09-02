@@ -76,7 +76,7 @@ public class ForkliftUnloadPaletteOnTruckAction : ForkliftBaseAction
         {
             return;
         }
-        Vector3 targetPosition = ((Truck.ForkliftUnloadPositions)this.targetTruckUnloadPositions).palettePosition;
+        Vector3 targetPosition = ((Truck.ForkliftUnloadPositions)this.targetTruckUnloadPositions).palletPosition;
         if (HandleRotationToward(targetPosition))
         {
             this.state = State.NearApproach;
@@ -89,7 +89,7 @@ public class ForkliftUnloadPaletteOnTruckAction : ForkliftBaseAction
         {
             return;
         }
-        Vector3 targetPosition = ((Truck.ForkliftUnloadPositions)this.targetTruckUnloadPositions).palettePosition;
+        Vector3 targetPosition = ((Truck.ForkliftUnloadPositions)this.targetTruckUnloadPositions).palletPosition;
         if (HandleMoveToward(targetPosition))
         {
             this.state = State.Unloading;

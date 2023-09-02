@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Palette : MonoBehaviour, IPalette
+public class Pallet : MonoBehaviour, IPallet
 {
 
     [SerializeField]

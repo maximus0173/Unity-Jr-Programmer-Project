@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4673050466215355760}
   m_Layer: 0
-  m_Name: PaletteHandle
+  m_Name: PalletHandle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -482,5 +482,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bd566e712ebc0744a88aac7161e0a5ac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  paletteHandle: {fileID: 4673050466215355760}
+  palletHandle: {fileID: 4673050466215355760}
   maxHeight: 4

@@ -9,7 +9,7 @@ public class Truck : MonoBehaviour, ITruck
     private Transform forkliftApproachTransform;
 
     [SerializeField]
-    private List<Transform> paletteTransforms = new List<Transform>();
+    private List<Transform> palletTransforms = new List<Transform>();
 
     [SerializeField]
     private Transform infoTransform;
@@ -17,7 +17,7 @@ public class Truck : MonoBehaviour, ITruck
     [SerializeField]
     private float forkliftMaxHeight = 2.5f;
 
-    private List<IPalette> loadedPalettes = new List<IPalette>();
+    private List<IPallet> loadedPalettes = new List<IPallet>();
 
     public Vector3 InfoPosition { get => this.infoTransform.position; }
 
@@ -35,7 +35,7 @@ public class Truck : MonoBehaviour, ITruck
         {
             return false;
         }
-        if (this.loadedPalettes.Count >= this.paletteTransforms.Count)
+        if (this.loadedPalettes.Count >= this.palletTransforms.Count)
         {
             return false;
         }
@@ -46,7 +46,7 @@ public class Truck : MonoBehaviour, ITruck
     {
         if (!CanUnloadPaletteFromForklift(forklift))
         {
-            throw new System.Exception("Cannot reserve for unload palette from forklift");
+            throw new System.Exception("Cannot reserve for unload pallet from forklift");
         }
         this.reservedForUnloadPaletteFromForklift = forklift;
     }
@@ -55,16 +55,16 @@ public class Truck : MonoBehaviour, ITruck
     {
         if (!CanUnloadPaletteFromForklift(forklift))
         {
-            throw new System.Exception("Cannot unload palette from forklift");
+            throw new System.Exception("Cannot unload pallet from forklift");
         }
-        this.loadedPalettes.Add(forklift.LoadedPalette);
+        this.loadedPalettes.Add(forklift.LoadedPallet);
     }
 
     public void CompleteReservationForUnloadPaletteFromForklift(IForklift forklift)
     {
         if (this.reservedForUnloadPaletteFromForklift != forklift)
         {
-            throw new System.Exception("Cannot complete reservation for unload palette from forklift");
+            throw new System.Exception("Cannot complete reservation for unload pallet from forklift");
         }
         this.reservedForUnloadPaletteFromForklift = null;
     }
@@ -72,21 +72,21 @@ public class Truck : MonoBehaviour, ITruck
     public ForkliftUnloadPositions? GetForkliftUnloadPositions(IForklift forklift)
     {
         int index = this.loadedPalettes.Count;
-        if (index >= this.paletteTransforms.Count)
+        if (index >= this.palletTransforms.Count)
         {
             return null;
         }
         return new ForkliftUnloadPositions()
         {
             approachPosition = this.forkliftApproachTransform.position,
-            palettePosition = this.paletteTransforms[index].position
+            palletPosition = this.palletTransforms[index].position
         };
     }
 
     public struct ForkliftUnloadPositions
     {
         public Vector3 approachPosition;
-        public Vector3 palettePosition;
+        public Vector3 palletPosition;
     }
 
 }

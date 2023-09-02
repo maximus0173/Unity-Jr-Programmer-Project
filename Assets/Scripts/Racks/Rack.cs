@@ -5,16 +5,16 @@ using UnityEngine;
 public class Rack : MonoBehaviour, IRack
 {
 
-    [SerializeField]
-    private BoxCollider mountCollider;
+    [SerializeField] private BoxCollider mountCollider;
     
-    [SerializeField]
-    private Transform[] forkliftApproachTransforms;
-    [SerializeField]
-    private Transform[] forkliftLoadingTransforms;
+    [SerializeField] private Transform[] forkliftApproachTransforms;
+    [SerializeField] private Transform[] forkliftLoadingTransforms;
 
-    private IPalette mountedPalette;
-    private IForklift reservedForForkliftUnloadPalette = null;
+    [SerializeField] private GameObject selectedMarker;
+
+    private IPallet mountedPalette;
+    private IForklift reservedForForkliftUnloadPallet = null;
+    private bool selectedMarkerShowed = false;
 
     public Vector3 Position { get => transform.position; }
 
@@ -37,14 +37,26 @@ public class Rack : MonoBehaviour, IRack
         }
     }
 
+    private void Update()
+    {
+        if (this.selectedMarker.activeSelf && !this.selectedMarkerShowed)
+        {
+            this.selectedMarkerShowed = true;
+        }
+        else if (this.selectedMarkerShowed)
+        {
+            this.selectedMarker.SetActive(false);
+        }
+    }
+
     private void InitialPaletteMounts()
     {
         RaycastHit[] hits = Physics.BoxCastAll(this.mountCollider.bounds.center, this.mountCollider.bounds.size / 2, transform.forward);
         foreach (RaycastHit hit in hits)
         {
-            if (hit.collider.TryGetComponent<IPalette>(out IPalette palette))
+            if (hit.collider.TryGetComponent<IPallet>(out IPallet pallet))
             {
-                MountPalette(palette);
+                MountPallet(pallet);
             }
         }
     }
@@ -55,7 +67,7 @@ public class Rack : MonoBehaviour, IRack
         {
             return false;
         }
-        if (this.reservedForForkliftUnloadPalette != null && this.reservedForForkliftUnloadPalette != forklift)
+        if (this.reservedForForkliftUnloadPallet != null && this.reservedForForkliftUnloadPallet != forklift)
         {
             return false;
         }
@@ -66,40 +78,46 @@ public class Rack : MonoBehaviour, IRack
     {
         if (!CanUnloadPaletteFromForklift(forklift))
         {
-            throw new System.Exception("Cannot reserve for unload palette from forklift");
+            throw new System.Exception("Cannot reserve for unload pallet from forklift");
         }
-        this.reservedForForkliftUnloadPalette = forklift;
+        this.reservedForForkliftUnloadPallet = forklift;
     }
 
-    public void MountPalette(IPalette palette)
+    public void MountPallet(IPallet pallet)
     {
         float maxDistance = 0.5f;
         if (this.mountedPalette == null
-            && Vector3.Distance(palette.Position, transform.position) < maxDistance)
+            && Vector3.Distance(pallet.Position, transform.position) < maxDistance)
         {
-            this.mountedPalette = palette;
+            this.mountedPalette = pallet;
             this.mountCollider.enabled = false;
-            GameManager.Instance.MountPaletteToRack(palette, this);
+            GameManager.Instance.MountPaletteToRack(pallet, this);
         }
     }
 
-    public void UnmountPalette(IPalette palette)
+    public void UnmountPalette(IPallet pallet)
     {
-        if (this.mountedPalette == palette)
+        if (this.mountedPalette == pallet)
         {
             this.mountedPalette = null;
             this.mountCollider.enabled = true;
-            GameManager.Instance.UnmountPaletteFromRack(palette, this);
+            GameManager.Instance.UnmountPalletFromRack(pallet, this);
         }
     }
 
     public void CompleteReservationForUnloadPaletteFromForklift(IForklift forklift)
     {
-        if (this.reservedForForkliftUnloadPalette != forklift)
+        if (this.reservedForForkliftUnloadPallet != forklift)
         {
-            throw new System.Exception("Cannot complete reservation for unload palette from forklift");
+            throw new System.Exception("Cannot complete reservation for unload pallet from forklift");
         }
-        this.reservedForForkliftUnloadPalette = null;
+        this.reservedForForkliftUnloadPallet = null;
+    }
+
+    public void ShowSelectedMarker()
+    {
+        this.selectedMarkerShowed = false;
+        this.selectedMarker.SetActive(true);
     }
 
     public ApproachPositions? GetForkliftApproachPositions(IForklift forklift)

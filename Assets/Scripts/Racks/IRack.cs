@@ -11,4 +11,6 @@ public interface IRack
 
     public Rack.ApproachPositions? GetForkliftApproachPositions(IForklift forklift);
 
+    public void ShowSelectedMarker();
+
 }

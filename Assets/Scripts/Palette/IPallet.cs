@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public interface IPalette
+public interface IPallet
 {
 
     public bool IsMountedToRack { get; }
@@ -13,6 +13,6 @@ public interface IPalette
 
     public Vector3 Position { get; }
 
-    public Palette.ApproachPositions? GetForkliftApproachPositions(IForklift forklift);
+    public Pallet.ApproachPositions? GetForkliftApproachPositions(IForklift forklift);
 
 }

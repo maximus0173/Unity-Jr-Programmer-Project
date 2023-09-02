@@ -67,6 +67,7 @@ public class RacksManager : MonoBehaviour
                 && GameManager.Instance.CanUnloadPaletteFromForkliftToRack(ForkliftsManager.Instance.SelectedForklift, hoveredRack))
             {
                 UIMainScene.Instance.ShowUnloadOnRackHoverText(hoveredRack.Position);
+                hoveredRack.ShowSelectedMarker();
             }
             else
             {

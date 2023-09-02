@@ -17,62 +17,62 @@ public class GameManager : MonoBehaviour
         Instance = this;
     }
 
-    public bool CanLoadPaletteToForklift(IPalette palette, IForklift forklift)
+    public bool CanLoadPaletteToForklift(IPallet pallet, IForklift forklift)
     {
-        if (palette == null || forklift == null)
+        if (pallet == null || forklift == null)
         {
             return false;
         }
-        Palette rootPalette = palette as Palette;
+        Pallet rootPalette = pallet as Pallet;
         Forklift rootForklift = forklift as Forklift;
         if (!rootPalette.CanBeTransported())
         {
             return false;
         }
-        if (!rootForklift.CanLoadPalette(palette))
+        if (!rootForklift.CanLoadPalette(pallet))
         {
             return false;
         }
         return true;
     }
 
-    public void MoveForkliftToLoadPalette(IPalette palette, IForklift forklift)
+    public void MoveForkliftToLoadPalette(IPallet pallet, IForklift forklift)
     {
-        if (!CanLoadPaletteToForklift(palette, forklift))
+        if (!CanLoadPaletteToForklift(pallet, forklift))
         {
-            throw new System.Exception("Cannot load palette to forklift");
+            throw new System.Exception("Cannot load pallet to forklift");
         }
-        Palette rootPalette = palette as Palette;
+        Pallet rootPalette = pallet as Pallet;
         Forklift rootForklift = forklift as Forklift;
-        rootForklift.MoveToLoadPalette(palette);
+        rootForklift.MoveToLoadPalette(pallet);
         rootPalette.PendingTransportByForklift(forklift);
     }
 
-    public void CancelMoveForkliftToLoadPalette(IPalette palette, IForklift forklift)
+    public void CancelMoveForkliftToLoadPalette(IPallet pallet, IForklift forklift)
     {
-        if (!palette.IsPendingTransport)
+        if (!pallet.IsPendingTransport)
         {
-            throw new System.Exception("Cannot cancel pending transport palette by forklift");
+            throw new System.Exception("Cannot cancel pending transport pallet by forklift");
         }
-        Palette rootPalette = palette as Palette;
+        Pallet rootPalette = pallet as Pallet;
         Forklift rootForklift = forklift as Forklift;
         rootPalette.CancelPendingTransportByForklift();
     }
 
-    public void LoadPaletteToForklift(IPalette palette, IForklift forklift)
+    public void LoadPaletteToForklift(IPallet pallet, IForklift forklift)
     {
-        if (!palette.IsPendingTransport)
+        if (!pallet.IsPendingTransport)
         {
-            throw new System.Exception("Cannot load palette to forklift because palette is not pending to transport");
+            throw new System.Exception("Cannot load pallet to forklift because pallet is not pending to transport");
         }
-        Palette rootPalette = palette as Palette;
+        Pallet rootPalette = pallet as Pallet;
         Forklift rootForklift = forklift as Forklift;
         if (rootPalette.IsMountedToRack)
         {
             IRack rack = rootPalette.MountedToRack;
             Rack rootRack = rack as Rack;
             rootPalette.UnmountFromRack();
-            rootRack.UnmountPalette(palette);
+            rootRack.UnmountPalette(pallet);
         }
         rootPalette.LoadToForklift(forklift);
     }
@@ -83,15 +83,15 @@ public class GameManager : MonoBehaviour
         {
             return false;
         }
-        IPalette palette = forklift.LoadedPalette;
-        Palette rootPalette = forklift.LoadedPalette as Palette;
+        IPallet pallet = forklift.LoadedPallet;
+        Pallet rootPalette = forklift.LoadedPallet as Pallet;
         Forklift rootForklift = forklift as Forklift;
         Truck rootTruck = truck as Truck;
         if (!rootPalette.IsTransportedByForklift)
         {
             return false;
         }
-        if (!rootForklift.HasPalette || rootForklift.LoadedPalette != palette)
+        if (!rootForklift.HasPalette || rootForklift.LoadedPallet != pallet)
         {
             return false;
         }
@@ -110,10 +110,10 @@ public class GameManager : MonoBehaviour
     {
         if (!CanUnloadPaletteFromForkliftToTruck(forklift, truck))
         {
-            throw new System.Exception("Cannot move forklift to unload palette to truck");
+            throw new System.Exception("Cannot move forklift to unload pallet to truck");
         }
-        IPalette palette = forklift.LoadedPalette;
-        Palette rootPalette = forklift.LoadedPalette as Palette;
+        IPallet pallet = forklift.LoadedPallet;
+        Pallet rootPallet = forklift.LoadedPallet as Pallet;
         Forklift rootForklift = forklift as Forklift;
         Truck rootTruck = truck as Truck;
         rootForklift.MoveToUnloadPaletteOnTruck(truck);
@@ -129,10 +129,10 @@ public class GameManager : MonoBehaviour
     {
         if (!CanUnloadPaletteFromForkliftToTruck(forklift, truck))
         {
-            throw new System.Exception("Cannot unload palette from forklift to truck");
+            throw new System.Exception("Cannot unload pallet from forklift to truck");
         }
-        IPalette palette = forklift.LoadedPalette;
-        Palette rootPalette = forklift.LoadedPalette as Palette;
+        IPallet pallet = forklift.LoadedPallet;
+        Pallet rootPalette = forklift.LoadedPallet as Pallet;
         Forklift rootForklift = forklift as Forklift;
         Truck rootTruck = truck as Truck;
         rootPalette.UnloadFromForklift();
@@ -146,20 +146,20 @@ public class GameManager : MonoBehaviour
         rootTruck.CompleteReservationForUnloadPaletteFromForklift(forklift);
     }
 
-    public void MountPaletteToRack(IPalette palette, IRack rack)
+    public void MountPaletteToRack(IPallet pallet, IRack rack)
     {
-        Palette rootPalette = palette as Palette;
+        Pallet rootPallet = pallet as Pallet;
         Rack rootRack = rack as Rack;
-        rootPalette.MountToRack(rack);
-        rootRack.MountPalette(palette);
+        rootPallet.MountToRack(rack);
+        rootRack.MountPallet(pallet);
     }
 
-    public void UnmountPaletteFromRack(IPalette palette, IRack rack)
+    public void UnmountPalletFromRack(IPallet pallet, IRack rack)
     {
-        Palette rootPalette = palette as Palette;
+        Pallet rootPallet = pallet as Pallet;
         Rack rootRack = rack as Rack;
-        rootPalette.UnmountFromRack();
-        rootRack.UnmountPalette(palette);
+        rootPallet.UnmountFromRack();
+        rootRack.UnmountPalette(pallet);
     }
 
     public bool CanUnloadPaletteFromForkliftToRack(IForklift forklift, IRack rack)
@@ -168,15 +168,15 @@ public class GameManager : MonoBehaviour
         {
             return false;
         }
-        IPalette palette = forklift.LoadedPalette;
-        Palette rootPalette = forklift.LoadedPalette as Palette;
+        IPallet pallet = forklift.LoadedPallet;
+        Pallet rootPalette = forklift.LoadedPallet as Pallet;
         Forklift rootForklift = forklift as Forklift;
         Rack rootRack = rack as Rack;
         if (!rootPalette.IsTransportedByForklift)
         {
             return false;
         }
-        if (!rootForklift.HasPalette || rootForklift.LoadedPalette != palette)
+        if (!rootForklift.HasPalette || rootForklift.LoadedPallet != pallet)
         {
             return false;
         }
@@ -195,10 +195,10 @@ public class GameManager : MonoBehaviour
     {
         if (!CanUnloadPaletteFromForkliftToRack(forklift, rack))
         {
-            throw new System.Exception("Cannot move forklift to unload palette to truck");
+            throw new System.Exception("Cannot move forklift to unload pallet to truck");
         }
-        IPalette palette = forklift.LoadedPalette;
-        Palette rootPalette = forklift.LoadedPalette as Palette;
+        IPallet pallet = forklift.LoadedPallet;
+        Pallet rootPalette = forklift.LoadedPallet as Pallet;
         Forklift rootForklift = forklift as Forklift;
         Rack rootRack = rack as Rack;
         rootForklift.MoveToUnloadPaletteOnRack(rack);
@@ -214,13 +214,13 @@ public class GameManager : MonoBehaviour
     {
         if (!CanUnloadPaletteFromForkliftToRack(forklift, rack))
         {
-            throw new System.Exception("Cannot unload palette from forklift to rack");
+            throw new System.Exception("Cannot unload pallet from forklift to rack");
         }
-        IPalette palette = forklift.LoadedPalette;
-        Palette rootPalette = forklift.LoadedPalette as Palette;
+        IPallet pallet = forklift.LoadedPallet;
+        Pallet rootPalette = forklift.LoadedPallet as Pallet;
         Forklift rootForklift = forklift as Forklift;
         Rack rootRack = rack as Rack;
-        MountPaletteToRack(palette, rack);
+        MountPaletteToRack(pallet, rack);
         rootPalette.UnloadFromForklift();
     }
 

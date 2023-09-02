@@ -9,7 +9,7 @@ public interface IForklift
 
     public bool HasPalette { get; }
 
-    public IPalette LoadedPalette { get; }
+    public IPallet LoadedPallet { get; }
 
     public float Height { get; }
 

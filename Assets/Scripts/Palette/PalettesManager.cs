@@ -7,7 +7,7 @@ public class PalettesManager : MonoBehaviour
 
     public static PalettesManager Instance { get; private set; }
 
-    private List<Palette> allPalettes = new List<Palette>();
+    private List<Pallet> allPallets = new List<Pallet>();
 
     private void Awake()
     {
@@ -37,22 +37,22 @@ public class PalettesManager : MonoBehaviour
         }
     }
 
-    public void RegisterPalette(Palette palette)
+    public void RegisterPalette(Pallet pallet)
     {
-        if (this.allPalettes.Contains(palette))
+        if (this.allPallets.Contains(pallet))
         {
             return;
         }
-        this.allPalettes.Add(palette);
+        this.allPallets.Add(pallet);
     }
 
-    public void UnregisterPalette(Palette palette)
+    public void UnregisterPalette(Pallet pallet)
     {
-        if (!this.allPalettes.Contains(palette))
+        if (!this.allPallets.Contains(pallet))
         {
             return;
         }
-        this.allPalettes.Remove(palette);
+        this.allPallets.Remove(pallet);
     }
 
     private void UserControl_OnMouseHover(object sender, UserControl.OnMouseHoverEventArgs e)
@@ -60,7 +60,7 @@ public class PalettesManager : MonoBehaviour
         if (ForkliftsManager.Instance != null && UIMainScene.Instance != null)
         {
             if (ForkliftsManager.Instance.SelectedForklift != null
-                && e.MouseHoveredObject.TryGetComponent<IPalette>(out IPalette hoveredPalette)
+                && e.MouseHoveredObject.TryGetComponent<IPallet>(out IPallet hoveredPalette)
                 && GameManager.Instance.CanLoadPaletteToForklift(hoveredPalette, ForkliftsManager.Instance.SelectedForklift))
             {
                 UIMainScene.Instance.ShowLoadHoverText(hoveredPalette.Position);
@@ -77,7 +77,7 @@ public class PalettesManager : MonoBehaviour
         if (ForkliftsManager.Instance != null)
         {
             if (e.IsLeftMouseButtonClicked && ForkliftsManager.Instance.SelectedForklift != null
-                && e.MouseClickedObject.TryGetComponent<IPalette>(out IPalette clickedPalette)
+                && e.MouseClickedObject.TryGetComponent<IPallet>(out IPallet clickedPalette)
                 && GameManager.Instance.CanLoadPaletteToForklift(clickedPalette, ForkliftsManager.Instance.SelectedForklift))
             {
                 GameManager.Instance.MoveForkliftToLoadPalette(clickedPalette, ForkliftsManager.Instance.SelectedForklift);

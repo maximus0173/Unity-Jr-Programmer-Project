@@ -31,13 +31,13 @@ public class Forklift : MonoBehaviour, IForklift
 
     public bool HasPalette { get => this.fork.HasPalette; }
 
-    public IPalette LoadedPalette { get => this.fork.LoadedPalette; }
+    public IPallet LoadedPallet { get => this.fork.LoadedPalette; }
 
     public float Height { get => this.fork.ForkMaxHeight; }
 
     public Vector3 Position { get => transform.position; }
 
-    public Transform ForkPaletteHandle { get => this.fork.PaletteHandle; }
+    public Transform ForkPaletteHandle { get => this.fork.PalletHandle; }
 
     private void Start()
     {
@@ -92,14 +92,14 @@ public class Forklift : MonoBehaviour, IForklift
         }
     }
 
-    public bool CanLoadPalette(IPalette palette)
+    public bool CanLoadPalette(IPallet pallet)
     {
-        return this.activeAction == this.moveAction && this.fork.CanLoadPalette(palette);
+        return this.activeAction == this.moveAction && this.fork.CanLoadPalette(pallet);
     }
 
-    public void MoveToLoadPalette(IPalette palette)
+    public void MoveToLoadPalette(IPallet pallet)
     {
-        if (!CanLoadPalette(palette))
+        if (!CanLoadPalette(pallet))
         {
             return;
         }
@@ -108,7 +108,7 @@ public class Forklift : MonoBehaviour, IForklift
             this.moveAction.Deactivate();
         }
         ActivateAction(this.loadPaletteAction);
-        this.loadPaletteAction.LoadPalette(palette);
+        this.loadPaletteAction.LoadPalette(pallet);
     }
 
     public bool CanUnloadPaletteOnTruck(ITruck truck)
