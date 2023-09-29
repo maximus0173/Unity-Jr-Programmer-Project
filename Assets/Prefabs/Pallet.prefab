@@ -167,7 +167,7 @@ GameObject:
   - component: {fileID: 1409316010397984062}
   - component: {fileID: 616457694951589100}
   - component: {fileID: 310590939895274950}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: Pallet
   m_TagString: Untagged
   m_Icon: {fileID: 0}

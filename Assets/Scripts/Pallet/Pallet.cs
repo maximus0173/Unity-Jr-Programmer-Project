@@ -26,17 +26,17 @@ public class Pallet : MonoBehaviour, IPallet
 
     private void Start()
     {
-        if (PalettesManager.Instance != null)
+        if (PalletesManager.Instance != null)
         {
-            PalettesManager.Instance.RegisterPalette(this);
+            PalletesManager.Instance.RegisterPalette(this);
         }
     }
 
     private void OnDestroy()
     {
-        if (PalettesManager.Instance != null)
+        if (PalletesManager.Instance != null)
         {
-            PalettesManager.Instance.UnregisterPalette(this);
+            PalletesManager.Instance.UnregisterPalette(this);
         }
     }
 

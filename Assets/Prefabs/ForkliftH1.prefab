@@ -130,7 +130,7 @@ GameObject:
   - component: {fileID: 8275298625025266794}
   - component: {fileID: 8275298625025266795}
   - component: {fileID: 8275298625025266789}
-  m_Layer: 0
+  m_Layer: 11
   m_Name: ForkliftH1
   m_TagString: Untagged
   m_Icon: {fileID: 0}

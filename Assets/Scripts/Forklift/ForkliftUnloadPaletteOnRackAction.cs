@@ -128,10 +128,18 @@ public class ForkliftUnloadPaletteOnRackAction : ForkliftBaseAction
         {
             return;
         }
+        try
+        {
+            this.agent.SetDestination(((Rack.ApproachPositions)approachPositions).longApproachPosition);
+        }
+        catch (System.Exception ex)
+        {
+            print(ex.Message);
+            return;
+        }
         this.targetRack = rack;
         this.targetRackApproachPositions = (Rack.ApproachPositions)approachPositions;
         this.state = State.LongApproach;
-        this.agent.SetDestination(((Rack.ApproachPositions)this.targetRackApproachPositions).longApproachPosition);
         this.fork.AdjustForkHeightToRack(this.targetRack);
     }
 

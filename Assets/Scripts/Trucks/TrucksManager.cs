@@ -8,8 +8,13 @@ public class TrucksManager : MonoBehaviour
 
     public static TrucksManager Instance { get; private set; }
 
+    [SerializeField] private Truck truck;
     [SerializeField] private PlayableDirector truckArriveTimeline;
     [SerializeField] private PlayableDirector truckDepartureTimeline;
+
+    private bool isDriving = false;
+
+    public bool IsDriving { get => this.isDriving; }
 
     private void Awake()
     {
@@ -23,6 +28,8 @@ public class TrucksManager : MonoBehaviour
 
     private void Start()
     {
+        this.truckArriveTimeline.stopped += TruckArriveTimeline_stopped;
+        this.truckDepartureTimeline.stopped += TruckDepartureTimeline_stopped;
         if (UserControl.Instance != null)
         {
             UserControl.Instance.OnMouseHover += UserControl_OnMouseHover;
@@ -32,6 +39,8 @@ public class TrucksManager : MonoBehaviour
 
     private void OnDestroy()
     {
+        this.truckArriveTimeline.stopped -= TruckArriveTimeline_stopped;
+        this.truckDepartureTimeline.stopped -= TruckDepartureTimeline_stopped;
         if (UserControl.Instance != null)
         {
             UserControl.Instance.OnMouseHover -= UserControl_OnMouseHover;
@@ -71,6 +80,30 @@ public class TrucksManager : MonoBehaviour
                 GameManager.Instance.MoveForkliftToUnloadPaletteToTruck(ForkliftsManager.Instance.SelectedForklift, clickedTruck);
             }
         }
+    }
+
+    private void TruckArriveTimeline_stopped(PlayableDirector timeline)
+    {
+        this.isDriving = false;
+    }
+
+    private void TruckDepartureTimeline_stopped(PlayableDirector timeline)
+    {
+        this.isDriving = false;
+        this.truck.ClearPalletes();
+        GameManager.Instance.StartNextTruckShippment();
+    }
+
+    public void DoArrive()
+    {
+        this.isDriving = true;
+        this.truckArriveTimeline.Play();
+    }
+
+    public void DoDeparture()
+    {
+        this.isDriving = true;
+        this.truckDepartureTimeline.Play();
     }
 
 }

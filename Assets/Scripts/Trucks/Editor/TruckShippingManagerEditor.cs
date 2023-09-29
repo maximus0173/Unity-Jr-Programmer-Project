@@ -12,7 +12,7 @@ public class TruckShippingManagerEditor : Editor
         DrawDefaultInspector();
 
         TruckShippingManager truckShippingManager = (TruckShippingManager)target;
-        if (GUILayout.Button("Generate shipments"))
+        if (GUILayout.Button("Generate single shipment"))
         {
             truckShippingManager.Generate();
         }

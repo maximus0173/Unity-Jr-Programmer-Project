@@ -103,6 +103,10 @@ public class GameManager : MonoBehaviour
         {
             return false;
         }
+        if (TruckShippingManager.Instance != null && !TruckShippingManager.Instance.IsPalletToShipping(pallet))
+        {
+            return false;
+        }
         return true;
     }
 
@@ -144,6 +148,10 @@ public class GameManager : MonoBehaviour
     {
         Truck rootTruck = truck as Truck;
         rootTruck.CompleteReservationForUnloadPaletteFromForklift(forklift);
+        if (truck.AllPalletesLoaded && TruckShippingManager.Instance != null)
+        {
+            TruckShippingManager.Instance.EndCurrentShippment();
+        }
     }
 
     public void MountPaletteToRack(IPallet pallet, IRack rack)
@@ -228,6 +236,17 @@ public class GameManager : MonoBehaviour
     {
         Rack rootRack = rack as Rack;
         rootRack.CompleteReservationForUnloadPaletteFromForklift(forklift);
+    }
+
+    public void StartNextTruckShippment()
+    {
+        TruckShippingManager.Instance.StartNextShippment();
+    }
+
+    public void RemovePallete(IPallet pallet)
+    {
+        Pallet rootPalette = pallet as Pallet;
+        Destroy(rootPalette.gameObject);
     }
 
 }

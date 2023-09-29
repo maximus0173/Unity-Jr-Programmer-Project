@@ -9,6 +9,8 @@ public interface ITruck
 
     public float ForkliftMaxHeight { get; }
 
+    public bool AllPalletesLoaded { get; }
+
     public Truck.ForkliftUnloadPositions? GetForkliftUnloadPositions(IForklift forklift);
 
 }

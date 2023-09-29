@@ -2,10 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PalettesManager : MonoBehaviour
+public class PalletesManager : MonoBehaviour
 {
 
-    public static PalettesManager Instance { get; private set; }
+    public static PalletesManager Instance { get; private set; }
 
     private List<Pallet> allPallets = new List<Pallet>();
 

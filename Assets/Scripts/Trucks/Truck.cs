@@ -23,10 +23,16 @@ public class Truck : MonoBehaviour, ITruck
 
     public float ForkliftMaxHeight { get => this.forkliftMaxHeight; }
 
-    public IForklift reservedForUnloadPaletteFromForklift = null;
+    public bool AllPalletesLoaded { get => this.loadedPalettes.Count >= this.palletTransforms.Count; }
+
+    private IForklift reservedForUnloadPaletteFromForklift = null;
 
     public bool CanUnloadPaletteFromForklift(IForklift forklift)
     {
+        if (TrucksManager.Instance.IsDriving)
+        {
+            return false;
+        }
         if (this.reservedForUnloadPaletteFromForklift != null && this.reservedForUnloadPaletteFromForklift != forklift)
         {
             return false;
@@ -81,6 +87,15 @@ public class Truck : MonoBehaviour, ITruck
             approachPosition = this.forkliftApproachTransform.position,
             palletPosition = this.palletTransforms[index].position
         };
+    }
+
+    public void ClearPalletes()
+    {
+        foreach (IPallet pallet in this.loadedPalettes)
+        {
+            GameManager.Instance.RemovePallete(pallet);
+        }
+        this.loadedPalettes.Clear();
     }
 
     public struct ForkliftUnloadPositions

@@ -21,6 +21,8 @@ public class UserControl : MonoBehaviour
     public event System.EventHandler<OnMouseHoverEventArgs> OnMouseHover;
     public event System.EventHandler<OnMouseClickEventArgs> OnMouseClick;
 
+    private int selectionLayerMask;
+
     private void Awake()
     {
         if (Instance != null)
@@ -29,6 +31,11 @@ public class UserControl : MonoBehaviour
             return;
         }
         Instance = this;
+    }
+
+    private void Start()
+    {
+        this.selectionLayerMask = LayerMask.GetMask("Selection");
     }
 
     private void Update()
@@ -66,7 +73,13 @@ public class UserControl : MonoBehaviour
     {
         Vector3 mousePosition = Input.mousePosition;
         var ray = gameCamera.ScreenPointToRay(mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit hit))
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, 1000, this.selectionLayerMask))
+        {
+            this.mouseRaycastHit = hit;
+            return;
+        }
+        if (Physics.Raycast(ray, out hit))
         {
             this.mouseRaycastHit = hit;
         }
