@@ -21,6 +21,12 @@ public class TruckShippingManager : MonoBehaviour
 
     [SerializeField] private Text shipmentText;
 
+    [SerializeField] private Text timeText;
+
+    [SerializeField] private Image missionFailedPanel;
+
+    [SerializeField] private Image missionAccomplishedPanel;
+
     [SerializeField] private PalletTime palletTimePrefab;
 
     [SerializeField] private List<Shipping> shipments = new List<Shipping>();
@@ -28,6 +34,8 @@ public class TruckShippingManager : MonoBehaviour
     private float elapsedTime = 0f;
 
     private int currentShippingIndex = -1;
+
+    private bool shippingCompleted = false;
 
     private List<PalletTime> uiPalleteTimes = new List<PalletTime>();
 
@@ -49,11 +57,17 @@ public class TruckShippingManager : MonoBehaviour
         {
             GameManager.Instance.StartNextTruckShippment();
         }
+        this.UpdateShipmentText();
+        InvokeRepeating("UpdateTimeText", 0f, 0.2f);
     }
 
     private void Update()
     {
-        this.elapsedTime += Time.deltaTime;
+        if (!this.shippingCompleted)
+        {
+            this.elapsedTime += Time.deltaTime;
+        }
+        CheckIfMissionFailed();
     }
 
     public void Generate()
@@ -97,10 +111,13 @@ public class TruckShippingManager : MonoBehaviour
         }
         if (this.currentShippingIndex + 1 >= this.shipments.Count)
         {
+            this.shippingCompleted = true;
+            this.missionAccomplishedPanel.gameObject.SetActive(true);
+            UpdateUi();
             return;
         }
         StartShippment(this.currentShippingIndex + 1);
-        this.UpdateShipment();
+        this.UpdateShipmentText();
     }
 
     public void EndCurrentShippment()
@@ -115,6 +132,10 @@ public class TruckShippingManager : MonoBehaviour
             Destroy(palletTime.gameObject);
         }
         this.uiPalleteTimes.Clear();
+        if (this.shippingCompleted)
+        {
+            return;
+        }
         int i = this.currentShippingIndex;
         int p = 1;
         while (i < this.shipments.Count && p <= 3)
@@ -149,9 +170,35 @@ public class TruckShippingManager : MonoBehaviour
         return shipping.pallets.Contains(pallet);
     }
 
-    private void UpdateShipment()
+    private void UpdateShipmentText()
     {
-        this.shipmentText.text = "Shipment: " + (this.currentShippingIndex + 1);
+        this.shipmentText.text = "Shipment: " + (this.currentShippingIndex + 1) + " / " + this.shipments.Count;
+    }
+
+    private void UpdateTimeText()
+    {
+        System.TimeSpan time = System.TimeSpan.FromSeconds(this.elapsedTime);
+        string timeStr = time.ToString(@"mm\:ss");
+        this.timeText.text = "Time: " + timeStr;
+    }
+
+    private void CheckIfMissionFailed()
+    {
+        if (this.shippingCompleted)
+        {
+            return;
+        }
+        if (this.currentShippingIndex >= 0)
+        {
+            Shipping shipping = this.shipments[this.currentShippingIndex];
+            int timeDiff = shipping.timeInSeconds - ElapsedTime;
+            if (timeDiff < 0)
+            {
+                this.shippingCompleted = true;
+                this.missionFailedPanel.gameObject.SetActive(true);
+                UpdateUi();
+            }
+        }
     }
 
 }

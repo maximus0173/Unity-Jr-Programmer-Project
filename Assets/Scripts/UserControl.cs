@@ -44,6 +44,7 @@ public class UserControl : MonoBehaviour
         HandleMouseRaycastHit();
         HandleMouseHover();
         HandleMouseButtonClick();
+        HandleMouseScreenAreas();
         return;
     }
 
@@ -168,6 +169,29 @@ public class UserControl : MonoBehaviour
             this.WorldPosition = worldPosition;
             this.MouseClickedObject = mouseClickedObject;
         }
+    }
+
+    private void HandleMouseScreenAreas()
+    {
+        Vector2 pos = Input.mousePosition;
+        Vector3 newPosition = gameCamera.transform.position;
+        if (pos.y > Screen.height - 100)
+        {
+            newPosition += new Vector3(1, 0, 0) * PanSpeed * Time.deltaTime;
+        }
+        else if (pos.y < 100)
+        {
+            newPosition += new Vector3(-1, 0, 0) * PanSpeed * Time.deltaTime;
+        }
+        if (newPosition.z < this.cameraCageZ.x)
+        {
+            newPosition.z = this.cameraCageZ.x;
+        }
+        else if (newPosition.z > this.cameraCageZ.y)
+        {
+            newPosition.z = this.cameraCageZ.y;
+        }
+        gameCamera.transform.position = newPosition;
     }
 
 }

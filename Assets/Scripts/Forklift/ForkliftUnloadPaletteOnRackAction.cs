@@ -124,19 +124,11 @@ public class ForkliftUnloadPaletteOnRackAction : ForkliftBaseAction
     public void UnloadPaletteOnRack(IRack rack)
     {
         Rack.ApproachPositions? approachPositions = rack.GetForkliftApproachPositions(this.forklift);
-        if (approachPositions == null)
+        if (approachPositions == null || !this.agent.enabled)
         {
             return;
         }
-        try
-        {
-            this.agent.SetDestination(((Rack.ApproachPositions)approachPositions).longApproachPosition);
-        }
-        catch (System.Exception ex)
-        {
-            print(ex.Message);
-            return;
-        }
+        this.agent.SetDestination(((Rack.ApproachPositions)approachPositions).longApproachPosition);
         this.targetRack = rack;
         this.targetRackApproachPositions = (Rack.ApproachPositions)approachPositions;
         this.state = State.LongApproach;

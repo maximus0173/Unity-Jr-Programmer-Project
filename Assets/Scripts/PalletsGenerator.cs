@@ -33,6 +33,7 @@ public class PalletsGenerator : MonoBehaviour
             GameObject pallete = PrefabUtility.InstantiatePrefab(this.palletePrefab, gameObject.transform) as GameObject;
             pallete.transform.position = rack.Position;
             pallete.transform.rotation = rack.Rotation;
+            racks.Remove(rack);
         }
     }
 
