@@ -3,12 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
+// INHERITANCE
 public class ForkliftMoveAction : ForkliftBaseAction
 {
 
     private NavMeshAgent agent;
     private Vector3? targetPosition = null;
 
+    // ENCAPSULATION
+    public Vector3? TargetPosition { get => this.targetPosition; }
+
+    // POLYMORPHISM
     protected override void Awake()
     {
         base.Awake();
@@ -33,6 +38,7 @@ public class ForkliftMoveAction : ForkliftBaseAction
         }
     }
 
+    // ABSTRACTION
     public void MoveToPosition(Vector3 position)
     {
         Vector3 targetPosition = position;
@@ -40,11 +46,13 @@ public class ForkliftMoveAction : ForkliftBaseAction
         this.agent.SetDestination(targetPosition);
     }
 
+    // POLYMORPHISM
     public override bool CanDeactivate()
     {
         return true;
     }
 
+    // POLYMORPHISM
     public override void Deactivate()
     {
         if (!CanDeactivate())

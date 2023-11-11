@@ -20,6 +20,8 @@ public class UIMainScene : MonoBehaviour
     [SerializeField]
     private RectTransform unloadOnTruckHoverText;
     [SerializeField]
+    private RectTransform forbiddenOnTruckHoverText;
+    [SerializeField]
     private RectTransform unloadOnRackHoverText;
 
     public InfoPopup InfoPopup;
@@ -108,6 +110,18 @@ public class UIMainScene : MonoBehaviour
     public void HideUnloadOnTruckHoverText()
     {
         this.unloadOnTruckHoverText.gameObject.SetActive(false);
+    }
+
+    public void ShowForbiddenOnTruckHoverText(Vector3 sourcePosition)
+    {
+        Vector3 screenPosition = Camera.main.WorldToScreenPoint(sourcePosition);
+        this.forbiddenOnTruckHoverText.gameObject.SetActive(true);
+        this.forbiddenOnTruckHoverText.position = screenPosition;
+    }
+
+    public void HideForbiddenOnTruckHoverText()
+    {
+        this.forbiddenOnTruckHoverText.gameObject.SetActive(false);
     }
 
     public void ShowUnloadOnRackHoverText(Vector3 sourcePosition)

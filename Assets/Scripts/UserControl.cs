@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 /// <summary>
 /// This script handle all the control code, so detecting when the users click on a unit or building and selecting those
@@ -15,6 +16,7 @@ public class UserControl : MonoBehaviour
     [SerializeField] private float PanSpeed = 10.0f;
     [SerializeField] private Vector2 cameraCageX = new Vector2(-25f, 9f);
     [SerializeField] private Vector2 cameraCageZ = new Vector2(-12f, 0f);
+    [SerializeField] private UnityEvent OnEscapePressed;
 
     private RaycastHit? mouseRaycastHit = null;
 
@@ -22,6 +24,7 @@ public class UserControl : MonoBehaviour
     public event System.EventHandler<OnMouseClickEventArgs> OnMouseClick;
 
     private int selectionLayerMask;
+    private bool isBlocked = false;
 
     private void Awake()
     {
@@ -40,6 +43,15 @@ public class UserControl : MonoBehaviour
 
     private void Update()
     {
+        if (isBlocked)
+        {
+            return;
+        }
+        HandleEscapePressed();
+        if (Time.timeScale == 0f)
+        {
+            return;
+        }
         HandleCameraMove();
         HandleMouseRaycastHit();
         HandleMouseHover();
@@ -128,6 +140,19 @@ public class UserControl : MonoBehaviour
         RaycastHit hit = (RaycastHit)this.mouseRaycastHit;
         GameObject clickedObject = hit.collider.gameObject;
         OnMouseClick?.Invoke(this, new OnMouseClickEventArgs(buttonNumber, mousePosition, hit.point, clickedObject));
+    }
+
+    public void BlockControls()
+    {
+        this.isBlocked = true;
+    }
+
+    private void HandleEscapePressed()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            this.OnEscapePressed?.Invoke();
+        }
     }
 
     public class OnMouseHoverEventArgs : System.EventArgs

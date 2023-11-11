@@ -113,6 +113,10 @@ public class TruckShippingManager : MonoBehaviour
         {
             this.shippingCompleted = true;
             this.missionAccomplishedPanel.gameObject.SetActive(true);
+            if (UserControl.Instance != null)
+            {
+                UserControl.Instance.BlockControls();
+            }
             UpdateUi();
             return;
         }
@@ -196,6 +200,10 @@ public class TruckShippingManager : MonoBehaviour
             {
                 this.shippingCompleted = true;
                 this.missionFailedPanel.gameObject.SetActive(true);
+                if (UserControl.Instance != null)
+                {
+                    UserControl.Instance.BlockControls();
+                }
                 UpdateUi();
             }
         }

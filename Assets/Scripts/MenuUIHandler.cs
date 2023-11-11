@@ -11,14 +11,20 @@ using UnityEditor;
 public class MenuUIHandler : MonoBehaviour
 {
 
+    [SerializeField] private UIOptionsPanel optionsPanel;
+
     public void StartNew()
     {
         SceneManager.LoadScene(1);
     }
 
+    public void Options()
+    {
+        this.optionsPanel.Show();
+    }
+
     public void Exit()
     {
-        MainManager.Instance.SaveColor();
 #if UNITY_EDITOR
         EditorApplication.ExitPlaymode();
 #else

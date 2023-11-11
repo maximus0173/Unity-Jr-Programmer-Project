@@ -65,6 +65,21 @@ public class TrucksManager : MonoBehaviour
                 UIMainScene.Instance.HideUnloadOnTruckHoverText();
             }
         }
+        if (ForkliftsManager.Instance != null && UIMainScene.Instance != null)
+        {
+            if (ForkliftsManager.Instance.SelectedForklift != null
+                && ForkliftsManager.Instance.SelectedForklift.HasPalette
+                && ForkliftsManager.Instance.SelectedForklift.CanMove()
+                && e.MouseHoveredObject.TryGetComponent<ITruck>(out ITruck hoveredTruck)
+                && !GameManager.Instance.CanUnloadPaletteFromForkliftToTruck(ForkliftsManager.Instance.SelectedForklift, hoveredTruck))
+            {
+                UIMainScene.Instance.ShowForbiddenOnTruckHoverText(hoveredTruck.InfoPosition);
+            }
+            else
+            {
+                UIMainScene.Instance.HideForbiddenOnTruckHoverText();
+            }
+        }
     }
 
     private void UserControl_OnMouseClicked(object sender, UserControl.OnMouseClickEventArgs e)

@@ -13,6 +13,7 @@ public class PalletsGenerator : MonoBehaviour
 
     public void Generate()
     {
+#if UNITY_EDITOR
         int loopCount = 10000;
         while (transform.childCount > 0 && loopCount > 0)
         {
@@ -35,6 +36,7 @@ public class PalletsGenerator : MonoBehaviour
             pallete.transform.rotation = rack.Rotation;
             racks.Remove(rack);
         }
+#endif
     }
 
 }

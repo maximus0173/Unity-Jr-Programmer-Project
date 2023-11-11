@@ -34,9 +34,17 @@ public class PalletTime : MonoBehaviour
         this.priority = priority;
         this.pallet = pallet;
         this.timeInSeconds = timeInSeconds;
-        if (this.priority == 1)
+        switch (this.priority)
         {
-            transform.localScale = 1.5f * transform.localScale;
+            case 1:
+                transform.localScale = 1.7f * transform.localScale;
+                break;
+            case 2:
+                transform.localScale = 1.0f * transform.localScale;
+                break;
+            case 3:
+                transform.localScale = 0.7f * transform.localScale;
+                break;
         }
         UpdateColor();
     }

@@ -61,7 +61,7 @@ AudioSource:
   m_GameObject: {fileID: 1918875529395501797}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -6972079995466130714, guid: 137c580cd43d6f9478e41ef90a11b656, type: 2}
   m_audioClip: {fileID: 8300000, guid: 2a9a0efc415e7e34d9298756099b3846, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0
@@ -652,7 +652,7 @@ MonoBehaviour:
   thresholdSpeed: 0.5
   minPitch: 0.8
   maxPitch: 1.2
-  maxVolume: 0.6
+  maxVolume: 0.5
   pitchChangeSpeed: 4
   localSpeed: 1
 --- !u!1 &9063068274933132103
@@ -695,7 +695,7 @@ AudioSource:
   m_GameObject: {fileID: 9063068274933132103}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -6972079995466130714, guid: 137c580cd43d6f9478e41ef90a11b656, type: 2}
   m_audioClip: {fileID: 8300000, guid: 86da1ddecf53be74fb46de7230a4975d, type: 3}
   m_PlayOnAwake: 0
   m_Volume: 0
