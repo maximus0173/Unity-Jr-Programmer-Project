@@ -8,3 +8,6 @@ There is less and less time for each subsequent delivery, so all forklifts must 
 <img src="Media/title_screen.jpg" alt="Game title screen" />
 <br/>
 <img src="Media/game_screen.jpg" alt="Game screen" />
+<br/><br/>
+Models: provided by Unity as course materials<br/>
+Music: composed by me for this project
