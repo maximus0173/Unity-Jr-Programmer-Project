@@ -13,4 +13,6 @@ There is less and less time for each subsequent delivery, so all forklifts must 
 <br/><br/>
 Models: provided by Unity as course materials<br/>
 Music: composed by me for this project<br/>
-https://twitter.com/maximus_173
+Sfx: created by me<br/>
+https://twitter.com/maximus_173<br/>
+https://www.youtube.com/@MaximusDev173<br/>
